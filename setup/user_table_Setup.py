@@ -41,7 +41,7 @@ def main():
     try:
         define_users_table()
         print("define_users_table executed.")
-    except:
+    except Exception as e:
         print(f"Error. Could not execute define_users_table(): {e}.")
 
 
