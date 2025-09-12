@@ -1,10 +1,12 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
-from app.user_model import User
-from app.stock_model import Stock
+from user_model import User
+from stock_model import Stock
+from trade_model import Trade
 import datetime
 import bcrypt
+
 
 # load db
 load_dotenv()
@@ -17,6 +19,8 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 class DB:
     """ class handles all database operations related to users: creation, authentication, updates,
         deletion, querying """
+    
+###   --------------------   USER QUERIES START   --------------------   ###
     
     def establish_connection(self):
         """ returns a psycopg2 db connection """
@@ -125,7 +129,7 @@ class DB:
 
     
     def get_user_password_hash(self, id):
-        """ accepts a user_id and returns the user's password_hash from db """
+        """ accepts a user id and returns the user's password_hash from db """
         
         try:
             with self.establish_connection() as conn:
@@ -145,6 +149,29 @@ class DB:
         except Exception as e:
             print(f"Error. Failed to retrieve user password hash: {e}.")
             return None
+        
+    
+    # def get_user_balance(self, id):
+    #     """ accepts a user id and returns the user's cash balance from db """
+        
+    #     try:
+    #         with self.establish_connection() as conn:
+    #             with conn.cursor() as cur:
+    #                 cur.execute(""" SELECT balance FROM users WHERE id=%s""", (id,))
+
+    #                 row = cur.fetchone()
+
+    #                 # ensure balance was found
+    #                 if row:
+    #                     (password_hash,) = row
+    #                     return password_hash
+    #                 else:
+    #                     print("Password hash not found.")
+    #                     return None
+
+    #     except Exception as e:
+    #         print(f"Error. Failed to retrieve user password hash: {e}.")
+    #         return None
 
 
     def update_user_balance(self, id, amount):
@@ -274,4 +301,48 @@ class DB:
             return False
 
 
+###   --------------------   USER QUERIES END   --------------------   ###
 
+###   --------------------   TRADE QUERIES START   --------------------   ###
+    def log_trade(self, trade):
+
+        """ accepts a trade object and inserts it into trades_log database """
+
+        try:
+            with self.establish_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO trades_log (user_id, company_name, symbol, price_per_share, 
+                                                number_of_shares, transaction_total, transaction_type)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        trade.user_id, trade.company_name, trade.symbol, trade.price_per_share,
+                        trade.number_of_shares, trade.transaction_total, trade.transaction_type
+                    ))
+
+                    conn.commit()
+                    return True
+
+        except Exception as e:
+            print(f"Error. Failed to log trade: {e}.")
+            return False    
+
+
+db = DB()
+
+
+
+# init stock
+company_name = "apple"
+symbol = "aapl"
+price = 125.8
+stock = Stock(company_name, symbol, price)
+
+# init trade
+user_id = 7
+number_of_shares = 3
+transaction_type = "BUY"
+
+trade = Trade(user_id, stock, number_of_shares, transaction_type)
+
+db.log_trade(trade)

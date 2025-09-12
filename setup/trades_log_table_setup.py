@@ -30,7 +30,7 @@ def define_trades_log_table():
                     symbol VARCHAR(20) NOT NULL,
                     date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     price_per_share NUMERIC(10, 2) NOT NULL,
-                    shares_purchased INTEGER NOT NULL CHECK (shares_purchased > 0),
+                    number_of_shares INTEGER NOT NULL CHECK (number_of_shares > 0),
                     transaction_total NUMERIC(12, 2) NOT NULL,
                     transaction_type VARCHAR(4) NOT NULL CHECK (transaction_type IN ('BUY', 'SELL'))
                 );
