@@ -1,7 +1,8 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
-from models import User
+from app.user_model import User
+from app.stock_model import Stock
 import datetime
 import bcrypt
 
