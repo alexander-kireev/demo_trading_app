@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from user_model import User
 from stock_model import Stock
 from trade_model import Trade
+from holding_model import Holding
 import datetime
 import bcrypt
 
@@ -300,6 +301,31 @@ class DB:
             print(f"Error. Unable to update user password: {e}")
             return False
 
+    # TODO: FINISH THIS TOMORROW FIRST!
+    def get_user_single_holding(self, user_id, stock):
+        try:
+            with self.establish_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""SELECT * FROM all_holdings WHERE user_id=%s AND symbol=%s""",
+                                (user_id, stock.symbol))
+                    
+                    row = cur.fetchone()
+
+                    # ensure user was found
+                    # the user object is returned with password_hash = None
+                    if row:
+                        id, first_name, last_name, dob, email, password_hash, balance = row
+                        return User(id=id, first_name=first_name, last_name=last_name,
+                                    dob=dob, email=email, balance=balance)           
+                    else:
+                        print("User not found.")
+                        return None
+                    
+        except Exception as e:
+            print(f"Error. Failed to retrieve user by email: {e}.")
+            return None
+
+        """ accepts user's id and a stock object, returns holding object """
 
 ###   --------------------   USER QUERIES END   --------------------   ###
 
