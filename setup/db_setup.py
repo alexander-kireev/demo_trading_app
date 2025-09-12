@@ -32,7 +32,7 @@ def define_users_table():
                     dob DATE NOT NULL,
                     email VARCHAR(100) NOT NULL,
                     password_hash TEXT NOT NULL,
-                    balance NUMERIC(12,2) DEFAULT 10000.00
+                    balance NUMERIC(12,2) NOT NULL
                 )
             """)
     
