@@ -43,6 +43,8 @@ def main():
         print("define_all_holdings_table executed.")
     except Exception as e:
         print(f"Error. Could not execute define_all_holdings_table(): {e}.")
+    # load_dotenv()
+    # print("Password from .env:", os.getenv("DB_PASSWORD"))
 
 
 if __name__ == '__main__':
