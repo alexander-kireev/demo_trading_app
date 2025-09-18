@@ -186,7 +186,7 @@ class DB:
         try:
             with self.establish_connection() as conn:
                 with conn.cursor() as cur:
-                    cur.execute(""" SELECT email FROM users WHERE email=%s""", (email,))
+                    cur.execute(""" SELECT email FROM users WHERE email=%s """, (email,))
                     row = cur.fetchone()
 
                     if row:
@@ -288,6 +288,55 @@ class DB:
         except Exception as e:
             print(f"Error. Unable to update user password: {e}")
             return False
+    
+    
+    def withdraw_funds(self, user_id, amount):
+        """ accepts user id and float amount, withdraws funds, updates users table """
+
+        # ensure user exists 
+        if user := self.get_user_by_id(user_id):
+
+            # ensure amount to withdraw is valid
+            if amount <= 0:
+                print("Minimum withdraw amount is 00.01 USD.")
+                return False
+            
+            # ensure balance is sufficient to withdraw amount requested
+            if amount > user.balance:
+                print("Not enough funds to withdraw requested amount.")
+                return False
+            
+            # withdraw and update balance
+            self.update_user_balance(user_id, (amount * -1))
+            print("Withdrawl successful.")
+            return True
+        
+        else:
+            print("User not found.")
+            return False
+
+
+    def deposit_funds(self, user_id, amount):
+        """ accepts user id and float amount, deposits funds, updates users table """
+
+        # ensure user exists 
+        if user := self.get_user_by_id(user_id):
+
+            # ensure amount to deposit is valid
+            if amount < 10.00:
+                print("Minimum deposit amount is 10.00 USD.")
+                return False
+            
+            # deposit and update balance
+            self.update_user_balance(user_id, amount)
+            print("Deposit successful.")
+            return True
+        
+        else:
+            print("User not found.")
+            return False
+
+
 
     
 ###   --------------------   USER QUERIES END   --------------------   ###
