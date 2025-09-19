@@ -1,10 +1,10 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
-from user_model import User
+from app.user.user_model import User
 from stock_model import Stock
-from trade_model import Trade
-from holding_model import Holding
+from app.trade.trade_model import Trade
+from app.position.position_model import Holding
 import datetime
 import bcrypt
 
@@ -18,11 +18,12 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 class DB:
-    """ class handles all database operations : creation, authentication, updates,
-        deletion, querying """
+    """ Class handles all database operations: creation, authentication, updates,
+        deletion, querying. """
     
 ###   --------------------   USER QUERIES START   --------------------   ###
     
+    # REFACTORED
     def establish_connection(self):
         """ returns a psycopg2 db connection """
         
@@ -34,10 +35,9 @@ class DB:
                 password=DB_PASSWORD
             )
 
-       
+    # REFACTORED
     def add_user(self, user):
-
-        """ accepts a user object, inserts it into users table """
+        """ Accepts a user object, inserts it into the users table. """
 
         # default balance set for new users. adjust as needed.
         default_balance = 10000.00
@@ -48,18 +48,46 @@ class DB:
                     cur.execute("""
                         INSERT INTO users (first_name, last_name, dob, email, password_hash, balance)
                         VALUES (%s, %s, %s, %s, %s, %s)
+                        RETURNING id
                     """, (
                         user.first_name, user.last_name, user.dob, user.email, user.password_hash, default_balance
                     ))
-
+                    (user_id,) = cur.fetchone()
                     conn.commit()
+
+                    self.deposit_funds(user_id, default_balance)
+
                     return True
 
         except Exception as e:
             print(f"Error. Failed to insert user: {e}.")
             return False
 
+    
+    def log_transaction(self, user_id, amount, transaction_type):
+        """ Accepts user_id, amount and transaction type, logs the transaction
+            in the transactions table, returning id of transactions logged """
 
+        try:
+            with self.establish_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO transactions (user_id, amount, transaction_type)
+                        VALUES (%s, %s, %s)
+                        RETURNING transaction_id
+                    """, (
+                    user_id, amount, transaction_type
+                ))
+                (transaction_id,) = cur.fetchone()
+                conn.commit()
+
+                return transaction_id
+
+        except Exception as e:
+            print(f"Error. Failed to log transaction: {e}")
+            return None
+ 
+    # REFACTORED
     def get_user_by_email(self, email):
 
         """ accepts a user's email and returns a user object """
@@ -85,7 +113,7 @@ class DB:
             print(f"Error. Failed to retrieve user by email: {e}.")
             return None
 
-
+    # REFACTORED
     def get_user_by_id(self, id):
 
         """ accepts a user's id and returns a user object """
@@ -111,7 +139,7 @@ class DB:
             print(f"Error. Failed to retrieve user by ID: {e}.")
             return None
 
-
+    # REFACTORED
     def delete_user(self, id):
 
         """ accepts a user_id and removes a user from the users table """
@@ -132,7 +160,7 @@ class DB:
             print(f"Error. Failed to delete user: {e}.")
             return False
 
-    
+    # REDUNDANT
     def get_user_password_hash(self, id):
 
         """ accepts a user id and returns the user's password_hash from db """
@@ -156,7 +184,7 @@ class DB:
             print(f"Error. Failed to retrieve user password hash: {e}.")
             return None
         
-
+    # REFACTORED
     def update_user_balance(self, id, amount):
 
         """ accepts a user's id and amount, updating the user's current balance """
@@ -178,7 +206,7 @@ class DB:
             print(f"Error. Could not update user's balance: {e}.")
             return False
 
-
+    # REFACTORED
     def check_email_exists(self, email):
 
         """ accepts an email and returns true if email is already in use """
@@ -198,7 +226,7 @@ class DB:
             print(f"Error. Could not validate email: {e}.")
             return False
 
-
+    # REFACTORED
     def authenticate_user(self, email, password):
 
         """ accepts user's email and password, returns user id if login is successful """
@@ -233,7 +261,7 @@ class DB:
             print(f"Error. Could not authenticate user: {e}.")
             return None
 
-    
+    # REFACTORED
     def update_user_email(self, id, new_email, password):
 
         """ accepts id, new email and current password, updates user's email in db """
@@ -262,7 +290,7 @@ class DB:
             print(f"Error. Unable to update user email: {e}")
             return False
 
-        
+    # REFACTORED    
     def update_user_password(self, id, current_password, new_password):
 
         """ accepts id, new password and current password, updates user's password in db """
@@ -289,7 +317,7 @@ class DB:
             print(f"Error. Unable to update user password: {e}")
             return False
     
-    
+    # REFACTORED
     def withdraw_funds(self, user_id, amount):
         """ accepts user id and float amount, withdraws funds, updates users table """
 
@@ -306,6 +334,10 @@ class DB:
                 print("Not enough funds to withdraw requested amount.")
                 return False
             
+            # log transaction
+            transaction_type = "WITHDRAW"
+            self.log_transaction(user_id, amount, transaction_type)
+            
             # withdraw and update balance
             self.update_user_balance(user_id, (amount * -1))
             print("Withdrawl successful.")
@@ -315,7 +347,7 @@ class DB:
             print("User not found.")
             return False
 
-
+    # REFACTORED
     def deposit_funds(self, user_id, amount):
         """ accepts user id and float amount, deposits funds, updates users table """
 
@@ -327,6 +359,10 @@ class DB:
                 print("Minimum deposit amount is 10.00 USD.")
                 return False
             
+            # log transaction
+            transaction_type = "DEPOSIT"
+            self.log_transaction(user_id, amount, transaction_type)
+
             # deposit and update balance
             self.update_user_balance(user_id, amount)
             print("Deposit successful.")
@@ -337,7 +373,9 @@ class DB:
             return False
 
 
-
+    def get_portfolio(self, user_id):
+        """ Accepts a user_id and returns the user's holdings, with cash balance
+            as a dictionary """
     
 ###   --------------------   USER QUERIES END   --------------------   ###
 
