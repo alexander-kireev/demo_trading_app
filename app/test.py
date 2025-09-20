@@ -1,10 +1,12 @@
-from user.user_model import User
-from user.user_service import (
-    register_user
-)
+# from user.user_model import User
+# from user.user_service import (
+#     register_user
+# )
 
-from setup.users_table_setup import define_users_table
+# from setup.users_table_setup import define_users_table
 
+from setup.test_for_import import my_var
+print(my_var)
 # # register a user
 # first_name = "bob"
 # last_name = "grimes"
@@ -14,4 +16,5 @@ from setup.users_table_setup import define_users_table
 
 # register_user(first_name, last_name, dob, email, password)
 
-define_users_table()
+# define_users_table()
+
