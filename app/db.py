@@ -381,6 +381,7 @@ class DB:
 
 ###   --------------------   TRADE QUERIES START   --------------------   ###
 
+    # REFACTORED
     def log_trade(self, trade):
 
         """ accepts a trade object and inserts it into trades_log database, returns trade id logged """
@@ -428,7 +429,7 @@ class DB:
             print(f"Error. Failed to remove trade from database: {e}.")
             return False
 
-
+    # REFACTORED
     def get_user_single_holding(self, user_id, symbol):
 
         """ accepts user's id and a stock object, returns holding object """
@@ -454,8 +455,7 @@ class DB:
             print(f"Error. Failed to retrieve single stock holding: {e}.")
             return None
 
-    # current_holding is only passed into the method IF user already
-    # has shares of a particular company
+    # REFACTORED
     def update_user_single_holding(self, user_id, trade, current_holding=None):
 
         """ accepts user's id, trade object, OPTIONAL current_holding object,

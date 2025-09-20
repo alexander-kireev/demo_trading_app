@@ -17,7 +17,7 @@ from app.position.positions_model import Positions
 
 from app.position.position_repo import (
     get_user_single_position_of_equity,
-    get_user_all_positions_of_equity,
+    get_user_positions_of_equity,
     log_position,
     close_position,
     update_position
@@ -93,7 +93,7 @@ class TradeService:
             with DBCore.get_connection() as conn:
                 with conn.cursor() as cur:
 
-                    positions = get_user_all_positions_of_equity(cur, user_id, stock.symbol)
+                    positions = get_user_positions_of_equity(cur, user_id, stock.symbol)
 
                     if number_of_shares > positions.total_number_of_shares:
                         return {

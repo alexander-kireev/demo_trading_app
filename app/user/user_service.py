@@ -1,20 +1,21 @@
-from app.db_core import DBCore
-from user_repo import (
+from db_core import DBCore
+from user.user_repo import (
     insert_user,
     get_user_by_email,
     get_user_by_id,
     remove_user,
     update_user_cash_balance
 )
-from app.utils import  (
+from utils import  (
     email_is_valid, 
     hash_password,
     verify_password
 )
-from user_model import User
+from user.user_model import User
 
 def register_user(first_name, last_name, dob, email, password):
-    """ Accepts a user object, inserts it into the users table. """
+    """ Accepts first_name, last_name, dob, email and raw password, 
+        instantiates a user object and inserts it into the users table. """
 
     try:
         with DBCore.get_connection() as conn:

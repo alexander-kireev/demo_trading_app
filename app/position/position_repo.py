@@ -19,7 +19,21 @@ def get_user_single_position_of_equity(cur, user_id, symbol):
         return None
 
 
-def get_user_all_positions_of_equity(cur, user_id, symbol):
+def get_user_equity_symbols(cur, user_id):
+    cur.execute(""" 
+        SELECT symbol FROM positions WHERE user_id=%s 
+        """, (
+        user_id
+        ))
+
+    rows = cur.fetchall()
+    symbols = []
+
+    for row in rows:
+        (symbol,) = row
+        symbols.append(symbol)
+
+def get_user_positions_of_equity(cur, user_id, symbol):
     cur.execute(""" 
         SELECT * FROM positions WHERE user_id=%s AND symbol=%s ORDER BY position_id ASC 
         """, (

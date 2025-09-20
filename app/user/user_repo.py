@@ -1,4 +1,4 @@
-from user_model import User
+from user.user_model import User
 
 
 def insert_user(cur, user):
