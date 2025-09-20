@@ -1,9 +1,18 @@
 class Position:
-    def __init__(self, stock, number_of_shares):
+    def __init__(self, stock, number_of_shares, user_id, total_value=None, position_id=None):   
+        self.user_id = user_id
         self.company_name = stock.company_name
         self.symbol = stock.symbol
-        self.price = stock.price
+        self.price_per_share = stock.price
         self.number_of_shares = number_of_shares
-        self.total_value = self.price * self.number_of_shares
+        self.total_value = total_value
+
+        if position_id:
+            self.position_id = position_id
+
+        if not total_value:
+            self.total_value = self.price_per_share * self.number_of_shares
+
+
 
 

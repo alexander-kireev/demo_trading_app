@@ -1,6 +1,6 @@
 class Trade:
     def __init__(self, user_id, stock,
-                 number_of_shares, transaction_type, transaction_total=None, trade_id=None):
+                 number_of_shares, transaction_type, trade_total=None, trade_id=None):
         self.user_id = user_id
         self.company_name = stock.company_name
         self.symbol = stock.symbol
@@ -11,9 +11,9 @@ class Trade:
         if trade_id:
             self.trade_id = trade_id
 
-        if transaction_total:
-            self.transaction_total = transaction_total
+        if trade_total:
+            self.trade_total = trade_total
         else:
-            self.transaction_total = self.number_of_shares * self.price_per_share
+            self.trade_total = self.number_of_shares * self.price_per_share
 
     

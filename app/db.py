@@ -2,7 +2,7 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from app.user.user_model import User
-from stock_model import Stock
+from app.stock.stock_model import Stock
 from app.trade.trade_model import Trade
 from app.position.position_model import Holding
 import datetime

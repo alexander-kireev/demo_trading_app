@@ -3,18 +3,30 @@ from app.user.user_repo import (
     get_user_by_id,
     update_user_cash_balance
 )
+
+from app.user.user_model import User
+
 from trade_model import Trade
 from trade_repo import (
     log_trade,
-    get_user_single_holding,
-    log_position
+
 )
 
 from app.position.position_model import Position
+from app.position.positions_model import Positions
+
+from app.position.position_repo import (
+    get_user_single_position_of_equity,
+    get_user_all_positions_of_equity,
+    log_position,
+    close_position,
+    update_position
+    
+)
 
 class TradeService:
 
-    def buy_stock(self, user_id, stock, num_shares):
+    def buy_stock(self, user_id, stock, number_of_shares):
         """ Accepts stock object, number of shares to buy, user_id and updates the holdings
             and trades_log tables. """
         
@@ -25,7 +37,7 @@ class TradeService:
 
                     user = get_user_by_id(cur, user_id)
 
-                    transaction_amount = stock.price * num_shares
+                    transaction_amount = stock.price * number_of_shares
 
                     if user.balance < transaction_amount:
                         return {
@@ -33,25 +45,18 @@ class TradeService:
                             "message": "Insufficient cash balance to purchases shares."
                         }
 
-                    trade = Trade(user_id=user_id, stock=stock, number_of_shares=num_shares,
+                    trade = Trade(user_id=user_id, stock=stock, number_of_shares=number_of_shares,
                                 transaction_type="BUY", transaction_total=transaction_amount)       
 
-
-                    if not log_trade(cur):
+                    if not log_trade(cur, trade):
                         return {
                             "success": False,
                             "message": "Failed to log trade."
                         }
+                
+                    position = Position(stock, number_of_shares)
 
-                    if current_position := get_user_single_holding(user_id, stock.symbol):
-                        # make new holding
-                        new_position = Position(stock, trade.number_of_shares)
-
-                    else:
-                        # TODO: IMPLEMENT POSITION CLASS
-                        new_position = Position(stock, trade.number_of_shares)
-
-                    if not log_position(cur, new_position):
+                    if not log_position(cur, position):
                         return {
                             "success": False,
                             "message": "Failed to log position."
@@ -62,7 +67,14 @@ class TradeService:
                         return {
                             "success": False,
                             "message": "Failed to update user cash balance."
-                        }                        
+                        }           
+
+                    conn.commit()
+
+                    return {
+                        "success": True,
+                        "message": "Shares successfully purchased."
+                    }                 
                       
         except Exception as e:
             return {
@@ -70,43 +82,103 @@ class TradeService:
                 "message": f"Error. Failed to purchase shares: {e}."
             }
                 
-    # DOES NOT ALLOW FOR SHORT SELLING
-    def sell_stock(self, stock, num_shares, user_id):
 
-        """ accepts stock object, number of shares to sell, user id and sells the stock.
-            DOES NOT ALLOW FOR SHORT SELLING """
+    def sell_stock(self, stock, number_of_shares, user_id):
 
-        db = DB()
+        """ Accepts stock object, number of shares to sell and user_id. Ensures user has
+            sufficient long position(s) open to sell desired number of shares. This function
+            DOES NOT allow for short selling. """
 
         try:
+            with DBCore.get_connection() as conn:
+                with conn.cursor() as cur:
 
-            # get user's current holding of this company
-            current_holding = db.get_user_single_holding(user_id=user_id, symbol=stock.symbol)
+                    positions = get_user_all_positions_of_equity(cur, user_id, stock.symbol)
 
-            # if user DOES NOT have enough shares to sell
-            if current_holding.number_of_shares < num_shares:
-                print("Insufficient shares held to sell.")
-                return False
-            
-            # if user DOES have enough shares to sell
-            else:
+                    if number_of_shares > positions.total_number_of_shares:
+                        return {
+                            "success": False,
+                            "message": "Insufficient shares to sell."
+                        }
 
-                # instantiate trade object, log the trade
-                trade = Trade(user_id=user_id, stock=stock, number_of_shares=num_shares, transaction_type="SELL")
-                trade_id = db.log_trade(trade)
 
-                # update the user's holding to reflect change. if the update fails, remove the trade from the log
-                if not db.update_user_single_holding(user_id=user_id, trade=trade, current_holding=current_holding):
-                    db.remove_trade(trade_id)
-                    raise Exception
-                
-                # update user's balance to reflect sale
-                db.update_user_balance(user_id, trade.transaction_total)
-                
-                return True
-                
+                    transaction_type = "SELL"
+                    total_value_shares_sold = 0
+
+                    position_number = 0
+
+                    while number_of_shares > 0: 
+                        # get earliest opened position
+                        first_position = positions.positions[position_number]
+                        # if number_of_shares > trade.number_of_shares
+                        if number_of_shares > first_position.number_of_shares:
+                            max_number_of_shares_for_trade = first_position.number_of_shares
+                        else:
+                            max_number_of_shares_for_trade = number_of_shares
+
+                        trade = Trade(user_id, stock, max_number_of_shares_for_trade, transaction_type)
+
+                        
+
+                        if not log_trade(cur, trade):
+                            return {
+                                "success": False,
+                                "message": "Failed to log trade."
+                            }
+                        
+                        if first_position.number_of_shares - number_of_shares < 1:
+
+                            if not close_position(cur, first_position):
+                                return {
+                                    "success": False,
+                                    "message": "Failed to close position."
+                                }
+                        
+                        else:
+                            
+                            updated_number_of_shares = first_position.number_of_shares - number_of_shares
+                            updated_total_value = updated_number_of_shares * first_position.price_per_share
+
+                            first_position.number_of_shares = updated_number_of_shares
+                            first_position.total_value = updated_total_value
+
+                            if not update_position(cur, first_position):
+                                return {
+                                    "success": False,
+                                    "message": "Insufficient shares to sell."
+                                }
+                            
+                        number_of_shares -= max_number_of_shares_for_trade
+                        total_value_shares_sold += first_position.total_value
+
+                        position_number += 1
+                    
+                    user = get_user_by_id(cur, user_id)
+
+                    new_user_cash_balance = user.cash_balance + total_value_shares_sold
+
+                    if not update_user_cash_balance(cur, user_id, new_user_cash_balance):
+                        return {
+                            "success": False,
+                            "message": "Failed to update user cash balance."
+                        }
+
+                    conn.commit()
+
+                    return {
+                            "success": True,
+                            "message": "Shares successfully sold."
+                        }
+           
         except Exception as e:
-            print(f"Error. Failed to liquidate shares: {e}.")
+            return {
+                "success": False,
+                "message": (f"Error. Failed to sell shares: {e}.")
+            }
+
+
+
+
 
 
 
