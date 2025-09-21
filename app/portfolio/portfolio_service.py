@@ -19,35 +19,45 @@ from app.position.position_service import (
 from app.position.position_repo import (
     get_user_positions_of_equity,
     get_user_single_position_of_equity,
-    get_user_all_positions,
+
     get_user_equity_symbols
 )
+
+
 def get_portfolio(user_id):
     try:
         with DBCore.get_connection() as conn:
             with conn.cursor() as cur:
-            
+                
+                # get user object
                 user = get_user_by_id(cur, user_id)
 
+                # ensure user is found
                 if not user:
                     return {
                         "success": False,
                         "message": "Failed to fetch user."
                     }
                 
+                # check if user has any equities in positions table
                 if equity_symbols := get_user_equity_symbols(cur, user_id):
 
-                    
-                    positions = aggregate_all_equity_positions(user, equity_symbols)
+                    # if he does, aggregate all positions into a positions object
+                    all_positions = aggregate_all_equity_positions(cur, user_id, equity_symbols)
 
+                    return positions
+
+                    # ensure positions are found
                     if not positions:
                         return {
                             "success": False,
                             "message": "Failed to aggregate positions."
                         }
                     
+                    # get total value of all equities
                     total_equities_value = aggregate_total_value_of_equity_positions(positions)
 
+                    # ensure it is found
                     if not total_equities_value:
                         return {
                             "success": False,
@@ -55,8 +65,11 @@ def get_portfolio(user_id):
                         }
                     
                     conn.commit()
+
+                    # instantiate portfolio object with equities and cash_balance
                     return Portfolio(user, positions, total_equities_value)
 
+                # if user has no open equity positions, instantiate portfolio object with cash_balance only
                 else:
                     return Portfolio(user)
                 

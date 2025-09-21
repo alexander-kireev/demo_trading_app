@@ -6,9 +6,9 @@ from app.position.position_repo import (
 )
 
 
-def aggregate_positions_of_single_equity(user_id, symbol):
-    positions = get_user_positions_of_equity(user_id, symbol)
-    
+def aggregate_positions_of_single_equity(cur, user_id, symbol):
+    positions = get_user_positions_of_equity(cur, user_id, symbol)
+    print(type(positions))
 
     total_shares = 0
     total_position_value = 0
@@ -29,10 +29,10 @@ def aggregate_positions_of_single_equity(user_id, symbol):
     }
 
 
-def aggregate_all_equity_positions(user_id, equity_symbols):
+def aggregate_all_equity_positions(cur, user_id, equity_symbols):
     positions = {}
     for symbol in equity_symbols:
-        positions[symbol] = aggregate_positions_of_single_equity(user_id, symbol)
+        positions[symbol] = aggregate_positions_of_single_equity(cur, user_id, symbol)
         
     return positions
 

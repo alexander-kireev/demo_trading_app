@@ -23,7 +23,7 @@ def get_user_equity_symbols(cur, user_id):
     cur.execute(""" 
         SELECT symbol FROM positions WHERE user_id=%s 
         """, (
-        user_id
+        user_id,
         ))
 
     rows = cur.fetchall()
@@ -33,6 +33,8 @@ def get_user_equity_symbols(cur, user_id):
         (symbol,) = row
         symbols.append(symbol)
 
+
+    return symbols
 
 # tested, functional
 def get_user_positions_of_equity(cur, user_id, symbol):
@@ -61,8 +63,7 @@ def get_user_positions_of_equity(cur, user_id, symbol):
 
         positions.append(position)
 
-
-    return Positions(positions, user_id, symbol)
+    return positions
 
 
 # tested, functional

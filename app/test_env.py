@@ -1,3 +1,5 @@
+from app.db_core import DBCore
+
 # user modules
 from app.user.user_model import User
 from app.user.user_service import (
@@ -21,7 +23,14 @@ from app.trade.trade_service import (
     sell_stock
 )
 
+from app.position.position_repo import (
+    get_user_equity_symbols,
+    get_user_positions_of_equity
+)
 
+from app.portfolio.portfolio_service import (
+    get_portfolio
+)
 
 # # register a user
 # first_name = "bob"
@@ -34,16 +43,47 @@ from app.trade.trade_service import (
 # new_password = "password"
 
 
-company_name = "Apple"
-symbol = "AAPL"
-price = 200
 
-stock = Stock(company_name, symbol, price)
+# # apple stock
+# company_name = "Apple"
+# symbol = "AAPL"
+# price = 200
+# stock_1 = Stock(company_name, symbol, price)
 
-#print(buy_stock(4, stock, 10))
-print(sell_stock(stock, 4, 4))
+# # google stock
+# company_name = "Google"
+# symbol = "GOOG"
+# price = 150
+# stock_2 = Stock(company_name, symbol, price)
+
+# # microsoft stock
+# company_name = "Microsoft"
+# symbol = "MSFT"
+# price = 185.90
+# stock_3 = Stock(company_name, symbol, price)
 
 
+# print(buy_stock(4, stock_1, 4))
+# print(buy_stock(4, stock_2, 6))
+# print(buy_stock(4, stock_3, 8))
+
+
+user_id = 4
+
+positions = get_portfolio(user_id)
+
+print(positions)
+
+
+# with DBCore.get_connection() as conn:
+#     with conn.cursor() as cur:
+        
+#         user_id = 4
+#         symbol = "aapl"
+#         positions = get_user_positions_of_equity(cur, user_id, symbol)
+#         # symbols = get_user_equity_symbols(cur, user_id)
+
+#         print(positions)
 
 
 
