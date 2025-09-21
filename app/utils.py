@@ -1,6 +1,5 @@
 import bcrypt
 
-
 def email_is_valid(email):
     return True
 

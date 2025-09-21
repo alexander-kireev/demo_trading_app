@@ -21,13 +21,4 @@ def define_positions_table():
         conn.commit()
 
 
-def main():
-    try:
-        define_positions_table()
-        print("Table positions successfully defined.")
-    except Exception as e:
-        print(f"Error. Failed to define positions table: {e}.")
 
-
-if __name__ == '__main__':
-    main()

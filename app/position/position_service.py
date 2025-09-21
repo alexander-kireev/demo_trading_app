@@ -1,5 +1,5 @@
 
-from position_repo import (
+from app.position.position_repo import (
     get_user_equity_symbols,
     get_user_positions_of_equity,
     get_user_single_position_of_equity

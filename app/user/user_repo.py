@@ -1,6 +1,6 @@
-from user.user_model import User
+from app.user.user_model import User
 
-
+# tested, functional
 def insert_user(cur, user):
     cur.execute("""
         INSERT INTO users (first_name, last_name, dob, email, password_hash, cash_balance, total_balance)
@@ -15,7 +15,10 @@ def insert_user(cur, user):
         user.total_balance
     ))
 
+    return cur.rowcount > 0
 
+
+# tested, functional
 def get_user_by_email(cur, email):
     cur.execute("""SELECT * FROM users WHERE email=%s""", (email,))
     
@@ -35,8 +38,9 @@ def get_user_by_email(cur, email):
         return None
     
 
+# tested, functional
 def get_user_by_id(cur, id):
-    cur.execute("""SELECT * FROM users WHERE id=%s""", (id,))
+    cur.execute(""" SELECT * FROM users WHERE id=%s """, (id,))
     
     row = cur.fetchone()
 
@@ -54,17 +58,24 @@ def get_user_by_id(cur, id):
         return None
 
 
+# tested, functional
 def remove_user(cur, user_id):
     cur.execute(""" DELETE FROM users WHERE id=%s """, (user_id,))
+    return cur.rowcount > 0
 
 
-def update_user_email(cur, user_id, new_email):
+# tested, unfunctional
+def insert_user_email(cur, user_id, new_email):
     cur.execute(""" UPDATE users SET email=%s WHERE id=%s """, (new_email, user_id))
+    return cur.rowcount > 0
 
 
-def update_user_password(cur, user_id, new_password):
-    cur.execute(""" UPDATE users SET password=%s WHERE id=%s """, (new_password, user_id))
+# tested, functional
+def insert_user_password(cur, user_id, new_password):
+    cur.execute(""" UPDATE users SET password_hash=%s WHERE id=%s """, (new_password, user_id))
+    return cur.rowcount > 0
 
-
+# tested, functional
 def update_user_cash_balance(cur, user_id, new_balance):
-    cur.execute(""" UPDATE users SET cash_balance=%s WHERE id=%s """, (user_id, new_balance))
+    cur.execute(""" UPDATE users SET cash_balance=%s WHERE id=%s """, (new_balance, user_id))
+    return cur.rowcount > 0

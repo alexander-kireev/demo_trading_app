@@ -1,7 +1,7 @@
 from app.stock.stock_model import Stock
 
-from position_model import Position
-from positions_model import Positions
+from app.position.position_model import Position
+from app.position.positions_model import Positions
 
 def get_user_single_position_of_equity(cur, user_id, symbol):
     cur.execute(""" SELECT * FROM positions WHERE user_id=%s AND symbol=%s """, (user_id, symbol))

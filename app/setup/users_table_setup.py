@@ -19,15 +19,3 @@ def define_users_table():
             """)
     
         conn.commit()
-
-
-def main():
-    try:
-        define_users_table()
-        print("Table users successfully defined.")
-    except Exception as e:
-        print(f"Error. Failed to define users table: {e}.")
-
-
-if __name__ == '__main__':
-    main()

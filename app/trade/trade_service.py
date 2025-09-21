@@ -6,8 +6,8 @@ from app.user.user_repo import (
 
 from app.user.user_model import User
 
-from trade_model import Trade
-from trade_repo import (
+from app.trade.trade_model import Trade
+from app.trade.trade_repo import (
     log_trade,
 
 )

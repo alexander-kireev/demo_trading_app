@@ -18,13 +18,4 @@ def define_transactions_table():
         conn.commit()
 
 
-def main():
-    try:
-        define_transactions_table()
-        print("Table transactions successfully defined.")
-    except Exception as e:
-        print(f"Error. Failed to define transactions table: {e}.")
 
-
-if __name__ == '__main__':
-    main()

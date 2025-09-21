@@ -3,9 +3,9 @@ from app.user.user_service import (
     get_user_by_id
 )
 
-from db_core import DBCore
+from app.db_core import DBCore
 
-from portfolio_model import Portfolio
+from app.portfolio.portfolio_model import Portfolio
 
 from app.position.position_model import Position
 from app.position.positions_model import Positions

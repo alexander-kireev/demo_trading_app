@@ -22,16 +22,6 @@ def define_trades_log_table():
         conn.commit()
 
 
-def main():
-    try:
-        define_trades_log_table()
-        print("Table trades_log successfully defined.")
-    except Exception as e:
-        print(f"Error. Failed to define trades_log table: {e}.")
 
-
-
-if __name__ == '__main__':
-    main()
 
 
