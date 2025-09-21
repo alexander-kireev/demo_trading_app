@@ -33,6 +33,8 @@ def get_user_equity_symbols(cur, user_id):
         (symbol,) = row
         symbols.append(symbol)
 
+
+# tested, functional
 def get_user_positions_of_equity(cur, user_id, symbol):
     cur.execute(""" 
         SELECT * FROM positions WHERE user_id=%s AND symbol=%s ORDER BY position_id ASC 
@@ -49,34 +51,40 @@ def get_user_positions_of_equity(cur, user_id, symbol):
     positions = []
 
     for row in rows:
+        print(row)
         (position_id, user_id, company_name, symbol, number_of_shares, 
-        average_price_per_share, total_value) = row
+        average_price_per_share, position_total, timestamp) = row
 
         stock = Stock(company_name=company_name, symbol=symbol, price=average_price_per_share)
         position = Position(stock=stock, number_of_shares=number_of_shares, user_id=user_id, 
-                            position_id=position_id, total_value=total_value)
+                            position_id=position_id, total_value=position_total)
 
         positions.append(position)
+
 
     return Positions(positions, user_id, symbol)
 
 
+# tested, functional
 def close_position(cur, position):
     cur.execute(""" DELETE FROM positions WHERE position_id=%s """, (position.position_id,))
-
+    
     return cur.rowcount > 0
 
-
+# tested, functional
 def update_position(cur, position):
     cur.execute(""" 
-        UPDATE positions SET number_of_shares=%s, total_value=%s WHERE position_id=%s 
+        UPDATE positions SET number_of_shares=%s, position_total=%s WHERE position_id=%s 
     """, (
         position.number_of_shares,
         position.total_value,
         position.position_id
     ))
 
+    return cur.rowcount > 0
 
+
+# tested, functional
 def log_position(cur, position):
     cur.execute(""" 
         INSERT INTO positions (user_id, company_name, symbol, number_of_shares,
@@ -87,6 +95,8 @@ def log_position(cur, position):
         position.company_name,
         position.symbol,
         position.number_of_shares,
-        position.average_price_per_share,
-        position.total
+        position.price_per_share,
+        position.total_value
     ))
+
+    return cur.rowcount > 0

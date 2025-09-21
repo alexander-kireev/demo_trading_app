@@ -1,3 +1,4 @@
+# user modules
 from app.user.user_model import User
 from app.user.user_service import (
     register_user,
@@ -9,19 +10,40 @@ from app.user.user_service import (
 )
 
 
+# stock modules
+from app.stock.stock_model import Stock
 
-# register a user
-first_name = "bob"
-last_name = "grimes"
-dob = "24-09-1995"
-email = "bob@email2.com"
-password = "password"
 
-new_email = "new_email@email.com"
-new_password = "password"
+# trade modules
+from app.trade.trade_model import Trade
+from app.trade.trade_service import (
+    buy_stock,
+    sell_stock
+)
 
-# print(register_user(first_name, last_name, dob, email, password))
-print(update_user_password(4, password, new_password))
+
+
+# # register a user
+# first_name = "bob"
+# last_name = "grimes"
+# dob = "24-09-1995"
+# email = "bob@email2.com"
+# password = "password"
+
+# new_email = "new_email@email.com"
+# new_password = "password"
+
+
+company_name = "Apple"
+symbol = "AAPL"
+price = 200
+
+stock = Stock(company_name, symbol, price)
+
+#print(buy_stock(4, stock, 10))
+print(sell_stock(stock, 4, 4))
+
+
 
 
 

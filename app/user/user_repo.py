@@ -75,6 +75,7 @@ def insert_user_password(cur, user_id, new_password):
     cur.execute(""" UPDATE users SET password_hash=%s WHERE id=%s """, (new_password, user_id))
     return cur.rowcount > 0
 
+
 # tested, functional
 def update_user_cash_balance(cur, user_id, new_balance):
     cur.execute(""" UPDATE users SET cash_balance=%s WHERE id=%s """, (new_balance, user_id))
