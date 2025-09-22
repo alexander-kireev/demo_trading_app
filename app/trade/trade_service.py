@@ -8,7 +8,8 @@ from app.user.user_model import User
 
 from app.trade.trade_model import Trade
 from app.trade.trade_repo import (
-    log_trade
+    log_trade,
+    get_trades
 )
 
 from app.position.position_model import Position
@@ -199,4 +200,30 @@ def sell_stock(stock, number_of_shares, user_id):
         }
 
 
+# tested, functional, commented
+def get_user_trade_history(user_id, start_date=None, end_date=None):
+    """ Accepts a user_id and optionally start and end dates. Queries
+        trades_log table and returns list of trade objects of user. """
 
+    try:
+        with DBCore.get_connection() as conn:
+            with conn.cursor() as cur:
+
+                # get list of trade objects from trades_log table
+                trades_list = get_trades(cur, user_id, start_date, end_date)
+
+                # ensure list exists
+                if not trades_list:
+                    return {
+                        "success": False,
+                        "message": "Failed to retrieve user trades from trades_log table."
+                    }
+
+                return trades_list
+            
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error. Failed to retrieve user trades: {e}."
+        }
+      

@@ -9,6 +9,11 @@ from app.user.user_repo import (
     insert_user_password
 )
 
+from app.transaction.transaction_model import Transaction
+from app.transaction.transaction_repo import (
+    log_transaction
+)
+
 from app.utils import  (
     email_is_valid, 
     hash_password,
@@ -59,6 +64,20 @@ def register_user(first_name, last_name, dob, email, password):
                         "success": False,
                         "message": "Failed to insert user."
                     }
+                
+                # get newly registered user for the unique user_id
+                registered_user = get_user_by_email(cur, email)
+
+                # instantiate transaction object to log initial deposit in transactions table
+                transaction_type = "DEPOSIT"
+                transaction = Transaction(registered_user.id, default_balance, transaction_type)
+
+                # ensure initial deposit transaction was logged in transactions table
+                if not log_transaction(cur, transaction):
+                    return {
+                        "success": False,
+                        "message": "Failed to log default deposit transaction."
+                    }                
 
                 conn.commit()
                 return {
@@ -212,8 +231,19 @@ def deposit_user_funds(user_id, amount):
                 if not update_user_cash_balance(cur, user_id, new_balance):
                     return {
                         "success": False,
-                        "message": "Failed to update user cash balance is databas."
+                        "message": "Failed to update user cash balance in table."
                     }
+                
+                # instantiate transaction object to log it in transaction table
+                transaction_type = "DEPOSIT"
+                transaction = Transaction(user_id, amount, transaction_type)
+
+                # ensure transaction was logged
+                if not log_transaction(cur, transaction):
+                    return {
+                            "success": False,
+                            "message": "Failed to log deposit in transactions table."
+                    }                  
 
                 conn.commit()
                 return {
@@ -254,7 +284,18 @@ def withdraw_user_funds(user_id, amount):
                     return {
                         "success": False,
                         "message": "Failed to update user cash balance in database."
-                    }            
+                    }
+
+                # instantiate transaction object to log it in transaction table
+                transaction_type = "WITHDRAW"
+                transaction = Transaction(user_id, amount, transaction_type)
+
+                # ensure transaction was logged
+                if not log_transaction(cur, transaction):
+                    return {
+                            "success": False,
+                            "message": "Failed to log withdraw in transactions table."
+                    }                            
 
                 conn.commit()
                 return {

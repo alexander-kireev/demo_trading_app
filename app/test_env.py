@@ -28,7 +28,15 @@ from app.stock.stock_model import Stock
 from app.trade.trade_model import Trade
 from app.trade.trade_service import (
     buy_stock,
-    sell_stock
+    sell_stock,
+    get_user_trade_history
+)
+from app.trade.trade_repo import (
+    get_trades
+)
+
+from app.transaction.transaction_service import (
+    get_user_transaction_history
 )
 
 from app.position.position_repo import (
@@ -42,17 +50,36 @@ from app.portfolio.portfolio_service import (
     aggregate_total_value_of_equity_positions
 )
 
-# register a user
-first_name = "alex"
-last_name = "jones"
-dob = "14-05-1985"
-email = "alex@email.com"
-password = "password"
+# # register a user
+# first_name = "john"
+# last_name = "markson"
+# dob = "11-06-1999"
+# email = "john@email.com"
+# password = "password"
 
 
-print(register_user(first_name, last_name, dob, email, password))
+# print(register_user(first_name, last_name, dob, email, password))
 
-user_id = 2
+user_id = 3
+transactions_list = get_user_transaction_history(user_id)
+# print(transactions_list)
+for transaction in transactions_list:
+    print(transaction)
+    print(f"trans id: {transaction.transaction_id}")
+    print(f"trans type: {transaction.transaction_type}")
+    print(f"trans total: {transaction.amount}")
+
+# with DBCore.get_connection() as conn:
+#     with conn.cursor() as cur:
+
+#         s_date = None
+#         e_date = None
+#         trades_list = get_trades(cur, user_id, start_date=s_date, end_date=e_date)
+
+#         for trade in trades_list:
+#             print(f"trade id: {trade.trade_id}")
+#             print(f"trade type: {trade.trade_type}")
+#             print(f"trade total: {trade.trade_total}")
 
 # # apple stock
 # company_name = "Apple"
@@ -79,10 +106,10 @@ user_id = 2
 
 
 
-portfolio = get_portfolio(user_id)
+# portfolio = get_portfolio(user_id)
 
 
-portfolio.print_portfolio()
+# portfolio.print_portfolio()
 
 # # print(positions)
 
