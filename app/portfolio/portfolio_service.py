@@ -45,7 +45,7 @@ def get_portfolio(user_id):
                     # if he does, aggregate all positions into a positions object
                     all_positions = aggregate_all_equity_positions(cur, user_id, equity_symbols)
 
-                    return positions
+                    return all_positions
 
                     # ensure positions are found
                     if not positions:
