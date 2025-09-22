@@ -1,4 +1,4 @@
-# tested, functional
+# tested, functional, commented
 class User:
     def __init__(self, first_name, last_name, dob, email, password_hash=None, 
                  cash_balance=None, total_balance=None, id=None):

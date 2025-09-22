@@ -1,5 +1,7 @@
 from app.db_core import DBCore
 
+from datetime import datetime
+
 # user modules
 from app.user.user_model import User
 from app.user.user_service import (
@@ -35,20 +37,22 @@ from app.position.position_repo import (
 )
 
 from app.portfolio.portfolio_service import (
-    get_portfolio
+    get_portfolio,
+    aggregate_positions_of_single_equity,
+    aggregate_total_value_of_equity_positions
 )
 
 # register a user
-first_name = "bob"
-last_name = "grimes"
-dob = "24-09-1995"
-email = "bob@email.com"
+first_name = "alex"
+last_name = "jones"
+dob = "14-05-1985"
+email = "alex@email.com"
 password = "password"
 
 
 print(register_user(first_name, last_name, dob, email, password))
 
-# user_id = 1
+user_id = 2
 
 # # apple stock
 # company_name = "Apple"
@@ -75,7 +79,10 @@ print(register_user(first_name, last_name, dob, email, password))
 
 
 
-# # positions = get_portfolio(user_id)
+portfolio = get_portfolio(user_id)
+
+
+portfolio.print_portfolio()
 
 # # print(positions)
 
@@ -84,11 +91,24 @@ print(register_user(first_name, last_name, dob, email, password))
 #     with conn.cursor() as cur:
         
 #         user_id = 1
-#         symbol = "aapl"
-#         positions = get_user_positions_of_equity(cur, user_id, symbol)
-#         # symbols = get_user_equity_symbols(cur, user_id)
+#         symbol = "goog"
+#         symbols = get_user_equity_symbols(cur, user_id)
+        
+        
 
-#         print(positions)
+#         for symbol in symbols:
+#             positions = get_user_positions_of_equity(cur, user_id, symbol)
+#             agg = aggregate_positions_of_single_equity(cur, user_id, symbol)
+#             print()
+#             print(f'company name: {agg["company_name"]}')
+#             print(f'num shares: {agg["number_of_shares"]}')
+#             print(f'av p: {agg["average_price_per_share"]}')
+#             print(f'total pos val: {agg["total_position_value"]}')
+#             print()
+        
+
+            # for position in positions:
+            #     print(position.company_name)
 
 
 

@@ -1,3 +1,4 @@
+# tested, functional, commented
 class Trade:
     def __init__(self, user_id, stock,
                  number_of_shares, trade_type, trade_total=None, trade_id=None):
@@ -8,9 +9,11 @@ class Trade:
         self.number_of_shares = number_of_shares
         self.trade_type = trade_type
         
+        # check if optional values were provided
         if trade_id:
             self.trade_id = trade_id
 
+        # if trade total was not provided as an arg, calculate it
         if trade_total:
             self.trade_total = trade_total
         else:

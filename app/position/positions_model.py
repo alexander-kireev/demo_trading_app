@@ -1,5 +1,5 @@
 
-# tested, functional
+# tested, functional, commented
 class Positions:
     def __init__(self, positions, user_id, symbol):
         self.user_id = user_id
@@ -7,7 +7,7 @@ class Positions:
         self.positions = positions
         self.total_number_of_shares = self.calc_total_number_of_shares()
 
-    
+    # calculates total value of positions held by user of a particular stock
     def calc_total_number_of_shares(self):
         total_shares = 0
         for position in self.positions:

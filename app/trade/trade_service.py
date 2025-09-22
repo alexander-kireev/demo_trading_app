@@ -23,7 +23,7 @@ from app.position.position_repo import (
 )
 
 
-# tested, functional
+# tested, functional, commented
 def buy_stock(user_id, stock, number_of_shares):
     """ Accepts stock object, number of shares to buy, user_id and updates the holdings
         and trades_log tables. """
@@ -77,7 +77,6 @@ def buy_stock(user_id, stock, number_of_shares):
                     }           
 
                 conn.commit()
-
                 return {
                     "success": True,
                     "message": "Shares successfully purchased."
@@ -90,9 +89,8 @@ def buy_stock(user_id, stock, number_of_shares):
         }
             
 
-# tested, functional
+# tested, functional, commented
 def sell_stock(stock, number_of_shares, user_id):
-
     """ Accepts stock object, number of shares to sell and user_id. Ensures user has
         sufficient long position(s) open to sell desired number of shares. This function
         DOES NOT allow for short selling. """
@@ -189,7 +187,6 @@ def sell_stock(stock, number_of_shares, user_id):
                     }
 
                 conn.commit()
-                
                 return {
                         "success": True,
                         "message": "Shares successfully sold."
@@ -200,5 +197,6 @@ def sell_stock(stock, number_of_shares, user_id):
             "success": False,
             "message": (f"Error. Failed to sell shares: {e}.")
         }
+
 
 

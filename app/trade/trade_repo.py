@@ -1,4 +1,7 @@
+# tested, functional, commented
 def log_trade(cur, trade):
+    """ Accepts cursor and trade object, inserts trade into trades_log table. """
+
     cur.execute(
         """ INSERT INTO trades_log (
                 user_id, 
