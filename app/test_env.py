@@ -2,6 +2,16 @@ from app.db_core import DBCore
 
 from datetime import datetime
 
+from app.exchange_data.exchange_service import (
+    get_amex_tickers,
+    get_nasdaq_tickers,
+    get_nyse_tickers,
+    load_nasdaq_tickers,
+    load_amex_tickers,
+    load_nyse_tickers
+)
+
+
 # user modules
 from app.user.user_model import User
 from app.user.user_service import (
@@ -60,14 +70,14 @@ from app.portfolio.portfolio_service import (
 
 # print(register_user(first_name, last_name, dob, email, password))
 
-user_id = 3
-transactions_list = get_user_transaction_history(user_id)
-# print(transactions_list)
-for transaction in transactions_list:
-    print(transaction)
-    print(f"trans id: {transaction.transaction_id}")
-    print(f"trans type: {transaction.transaction_type}")
-    print(f"trans total: {transaction.amount}")
+# user_id = 3
+# transactions_list = get_user_transaction_history(user_id)
+# # print(transactions_list)
+# for transaction in transactions_list:
+#     print(transaction)
+#     print(f"trans id: {transaction.transaction_id}")
+#     print(f"trans type: {transaction.transaction_type}")
+#     print(f"trans total: {transaction.amount}")
 
 # with DBCore.get_connection() as conn:
 #     with conn.cursor() as cur:
@@ -140,6 +150,7 @@ for transaction in transactions_list:
 
 
 
+tics = load_nasdaq_tickers()
 
-
-
+for i in range(101):
+    print(tics[i])
