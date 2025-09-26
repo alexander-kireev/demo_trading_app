@@ -23,8 +23,9 @@ from app.position.position_service import (
 from app.position.position_repo import (
     get_user_positions_of_equity,
     get_user_single_position_of_equity,
-
-    get_user_equity_symbols
+    get_all_user_positions,
+    get_user_equity_symbols,
+    update_list_of_positions
 )
 
 # tested, functional, commented
@@ -97,9 +98,48 @@ def get_live_portfolio(user_id):
     return portfolio
 
 # TODO: IMPLEMENT THIS
-def update_portfolio(user_id):
-    # update stock prices in db
+def update_stocks_in_table(user_id):
+    # fetch all user symbols of equities
+    # for each equity, update its price 
+    try:
+        with DBCore.get_connection() as conn:
+            with conn.cursor() as cur:
+
+                symbols = get_user_equity_symbols(cur, user_id)
+
+                symbols_with_live_prices = {}
+                for symbol in symbols:
+                    live_price = live_stock_price(symbol)
+                    symbols_with_live_prices[symbol] = live_price
+
+                
+                positions = get_all_user_positions(cur, user_id)
+
+                for position in positions:
+                    symbol = position.symbol
+                    live_price = symbols_with_live_prices[symbol]
+                    new_total_value = position.number_of_shares * live_price
+                    position.last_price_per_share = live_price
+                    position.total_value = new_total_value
+                
+                if not update_list_of_positions(cur, positions):
+                    return {
+                        "success": False,
+                        "message": "Failed to update list of positions in positions table."
+                    }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error. Failed to update stock prices in table: {e}."
+        }
+            
 
     #
     return
     # update
+
+# TODO: IMPLEMENT! or redundant, can update via instantiating a portfolio objecT?
+def update_portfolio(user_id):
+    #update stock prices
+    #update balance?
+    return 

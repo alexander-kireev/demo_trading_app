@@ -142,3 +142,45 @@ def update_positions_last_price(cur, user_id, symbol, live_price):
     ))
 
     
+# UNTESTED
+def get_all_user_positions(cur, user_id):
+    cur.execute(""" SELECT * FROM positions WHERE user_id=%s """, (user_id,))
+
+    rows = cur.fetchall()
+
+    if not rows:
+        return None
+    
+    positions = []
+
+    for row in rows:
+        # unpack each row returned
+        (position_id, user_id, company_name, symbol, number_of_shares, 
+        average_price_per_share, last_price_per_share, position_total, timestamp) = row
+
+        # refactor into Stock and then Position objects
+        stock = Stock(company_name=company_name, symbol=symbol, price=average_price_per_share)
+        position = Position(stock=stock, number_of_shares=number_of_shares, user_id=user_id, 
+                            position_id=position_id, last_price_per_share=last_price_per_share)
+
+        positions.append(position)
+    
+    return positions
+
+# UNTESTED
+def update_list_of_positions(cur, positions):
+    for p in positions:
+        cur.execute(""" UDPATE positions SET 
+            number_of_shares=%s,
+            last_price_per_share=%s,
+            position_total=%s
+            WHERE 
+            position_id=%s         
+        """, (
+            p.number_of_shares,
+            p.last_price_per_share,
+            p.total_value,
+            p.position_id
+        ))
+    
+    return cur.rowcount > 0
