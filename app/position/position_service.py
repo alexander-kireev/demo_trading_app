@@ -19,15 +19,18 @@ def aggregate_positions_of_single_equity(cur, user_id, symbol):
     # gets a list of objects of class Position
     # (all positions held by user of certain equity as a list of objects)
     positions = get_user_positions_of_equity(cur, user_id, symbol)
-
+    #CAN PRINT THIS!! ABOVE
     # set counters
     total_shares = 0
     total_position_value = 0
 
+    # get the list containing the pisitions from object positions
+    positions = positions.positions
+    
     # calculate how many shares user owns and their total value
     for position in positions:
-        total_shares += position.number_of_shares
-        total_position_value += position.total_value
+        total_shares += int(position.number_of_shares)
+        total_position_value += float(position.total_value)
 
     # get average price per share
     company_name = positions[0].company_name
@@ -68,7 +71,7 @@ def aggregate_total_value_of_equity_positions(positions):
 
     total_equities_value = 0
     for symbol in positions:
-        total_equities_value += positions[symbol].total_value
+        total_equities_value += float(positions[symbol].total_value)
 
-    return float(total_equities_value)
+    return total_equities_value
 

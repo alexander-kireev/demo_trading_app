@@ -22,3 +22,8 @@ def create_stocks(symbols):
         stocks[symbol] = create_stock(symbol)
     
     return stocks
+
+
+
+def live_stock_price(symbol):
+    return Ticker(symbol).info["regularMarketPrice"]

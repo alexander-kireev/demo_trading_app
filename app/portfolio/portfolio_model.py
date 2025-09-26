@@ -8,11 +8,11 @@ class Portfolio:
         if positions:
             self.positions = positions
             self.positions_value = total_equities_value
-            self.portfolio_value = self.positions_value + self.cash_balance
+            self.portfolio_value = float(self.positions_value) + float(self.cash_balance)
         # if user has no open equity positions
         else:
             self.positions = None
-            self.portfolio_value = self.cash_balance
+            self.portfolio_value = float(self.cash_balance)
     
     # prints portfolio. this is more of a testing function for now
     def print_portfolio(self):

@@ -20,9 +20,13 @@ from app.position.position_repo import (
     get_user_positions_of_equity,
     log_position,
     close_position,
-    update_position
+    update_position,
+    update_positions_last_price
 )
 
+from app.stock.stock_service import (
+    live_stock_price
+)
 
 # tested, functional, commented
 def buy_stock(user_id, stock, number_of_shares):
@@ -103,17 +107,25 @@ def sell_stock(stock, number_of_shares, user_id):
                 # get positions object with list of positions of single stock
                 positions = get_user_positions_of_equity(cur, user_id, stock.symbol)
 
+                print(positions.total_number_of_shares)
+                
                 # ensure user has sufficient shares to sell desired amount
                 if number_of_shares > positions.total_number_of_shares:
                     return {
                         "success": False,
                         "message": "Insufficient shares to sell."
                     }
-
+                
                 # set counters
                 transaction_type = "SELL"
                 total_value_shares_sold = 0
                 position_number = 0
+
+                # get live stock price from API
+                current_stock_price = live_stock_price(stock.symbol)
+
+                # update price in stock object with current price
+                stock.price = current_stock_price
 
                 # run loop while shares remain to be sold
                 while number_of_shares > 0:
@@ -152,11 +164,12 @@ def sell_stock(stock, number_of_shares, user_id):
                         
                         # calculate new number_of_shares and total_value of position
                         updated_number_of_shares = first_position.number_of_shares - number_of_shares
-                        updated_total_value = updated_number_of_shares * first_position.price_per_share
+                        updated_total_value = updated_number_of_shares * stock.price
 
                         # update the values in the object
                         first_position.number_of_shares = updated_number_of_shares
                         first_position.total_value = updated_total_value
+                        first_position.last_price_per_share = stock.price
 
                         # update position in positions table
                         if not update_position(cur, first_position):
@@ -186,6 +199,9 @@ def sell_stock(stock, number_of_shares, user_id):
                         "success": False,
                         "message": "Failed to update user cash balance."
                     }
+
+                # update any remaining positions with live price
+                update_positions_last_price(cur, user_id, stock.symbol, stock.price)
 
                 conn.commit()
                 return {

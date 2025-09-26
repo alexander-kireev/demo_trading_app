@@ -3,6 +3,10 @@ from app.user.user_service import (
     get_user_by_id
 )
 
+from pprint import pprint
+from app.stock.stock_service import (
+    live_stock_price
+)
 from app.db_core import DBCore
 
 from app.portfolio.portfolio_model import Portfolio
@@ -25,6 +29,8 @@ from app.position.position_repo import (
 
 # tested, functional, commented
 def get_portfolio(user_id):
+    """ Accepts a user_id and returns a portfolio object with NON-LIVE stock price data. """
+
     try:
         with DBCore.get_connection() as conn:
             with conn.cursor() as cur:
@@ -44,6 +50,7 @@ def get_portfolio(user_id):
 
                     # if they do, aggregate all positions into a single Position object
                     all_positions = aggregate_all_equity_positions(cur, user_id, equity_symbols)
+
 
                     # ensure positions are found
                     if not all_positions:
@@ -76,5 +83,23 @@ def get_portfolio(user_id):
         }
 
 
+###
+def get_live_portfolio(user_id):
+    """ Accepts a user_id and returns the user's portfolio as an object with updated  """
 
+    portfolio = get_portfolio(user_id)
+    positions = portfolio.positions
+    
+    for position in positions:
+        live_price = live_stock_price(positions[position].symbol)
+        positions[position].price_per_share = live_price
 
+    return portfolio
+
+# TODO: IMPLEMENT THIS
+def update_portfolio(user_id):
+    # update stock prices in db
+
+    #
+    return
+    # update

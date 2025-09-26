@@ -1,5 +1,7 @@
 from app.db_core import DBCore
 
+from pprint import pprint
+
 from datetime import datetime
 
 from app.exchange_data.exchange_service import (
@@ -56,7 +58,25 @@ from app.position.position_repo import (
 
 from app.portfolio.portfolio_service import (
     get_portfolio,
+    get_live_portfolio,
     aggregate_positions_of_single_equity,
     aggregate_total_value_of_equity_positions
 )
+
+
+user_id = 3
+
+symbol = "AAPL"
+price = 256.87
+company_name = "Apple"
+number_of_shares = 5
+
+stock = Stock(company_name=company_name, symbol=symbol, price=price)
+
+number_of_shares = 4
+# print(buy_stock(user_id=user_id, stock=stock, number_of_shares=number_of_shares))
+# print(sell_stock(stock=stock, number_of_shares=number_of_shares, user_id=user_id))
+portfolio = get_portfolio(3)
+
+portfolio.print_portfolio()
 

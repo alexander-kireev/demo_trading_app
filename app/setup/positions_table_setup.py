@@ -13,6 +13,7 @@ def define_positions_table():
                     symbol VARCHAR(20) NOT NULL,
                     number_of_shares INTEGER NOT NULL,
                     average_price_per_share NUMERIC(10, 2) NOT NULL,
+                    last_price_per_share NUMERIC(10, 2) NOT NULL,
                     position_total NUMERIC(12, 2) NOT NULL,
                     timestamp_opened TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP       
                 );

@@ -20,7 +20,7 @@ def get_user_single_position_of_equity(cur, user_id, symbol):
         # refactor and return position as object Position
         stock = Stock(company_name=company_name, symbol=symbol, price=average_price_per_share)
         return Position(stock=stock, number_of_shares=number_of_shares, 
-                        user_id=user_id, position_id=position_id, total_value=total_value)
+                        user_id=user_id, position_id=position_id)
     else:
         return None
 
@@ -69,16 +69,16 @@ def get_user_positions_of_equity(cur, user_id, symbol):
     for row in rows:
         # unpack each row returned
         (position_id, user_id, company_name, symbol, number_of_shares, 
-        average_price_per_share, position_total, timestamp) = row
+        average_price_per_share, last_price_per_share, position_total, timestamp) = row
 
         # refactor into Stock and then Position objects
         stock = Stock(company_name=company_name, symbol=symbol, price=average_price_per_share)
         position = Position(stock=stock, number_of_shares=number_of_shares, user_id=user_id, 
-                            position_id=position_id, total_value=position_total)
+                            position_id=position_id, last_price_per_share=last_price_per_share)
 
         positions.append(position)
-
-    return positions
+    
+    return Positions(user_id=user_id, symbol=symbol, positions=positions)
 
 
 # tested, functional, commented
@@ -90,15 +90,17 @@ def close_position(cur, position):
     
     return cur.rowcount > 0
 
+
 # tested, functional, commented
 def update_position(cur, position):
     """ Accepts cursor and position object, updates the shares and total of position
         using position_id. """
 
     cur.execute(""" 
-        UPDATE positions SET number_of_shares=%s, position_total=%s WHERE position_id=%s 
+        UPDATE positions SET number_of_shares=%s, last_price_per_share=%s, position_total=%s WHERE position_id=%s 
     """, (
         position.number_of_shares,
+        position.last_price_per_share,
         position.total_value,
         position.position_id
     ))
@@ -113,15 +115,30 @@ def log_position(cur, position):
 
     cur.execute(""" 
         INSERT INTO positions (user_id, company_name, symbol, number_of_shares,
-        average_price_per_share, position_total)
-        VALUES (%s, %s, %s, %s, %s, %s) 
+        average_price_per_share, last_price_per_share, position_total)
+        VALUES (%s, %s, %s, %s, %s, %s, %s) 
     """, (
         position.user_id,
         position.company_name,
         position.symbol,
         position.number_of_shares,
         position.price_per_share,
+        position.last_price_per_share,
         position.total_value
     ))
 
     return cur.rowcount > 0
+
+
+# tested, functional, commented
+def update_positions_last_price(cur, user_id, symbol, live_price):
+    """ Accepts cursor, user_id, symbol and live price of stock. Updates all positions
+        held by user of this equity to reflect live price. """
+
+    cur.execute("""
+        UPDATE positions SET last_price_per_share=%s WHERE user_id=%s AND symbol=%s
+    """, (
+        live_price, user_id, symbol
+    ))
+
+    
