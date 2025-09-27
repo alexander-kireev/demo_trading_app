@@ -1,3 +1,4 @@
+from app.db_core import DBCore
 
 from app.position.position_repo import (
     get_user_equity_symbols,
@@ -7,6 +8,18 @@ from app.position.position_repo import (
 from app.stock.stock_model import Stock
 
 from app.position.position_model import Position
+
+from app.position.position_repo import (
+    get_user_positions_of_equity,
+    get_user_single_position_of_equity,
+    get_all_user_positions,
+    get_user_equity_symbols,
+    update_list_of_positions
+)
+
+from app.stock.stock_service import (
+    live_stock_price
+)
 
 # tested, functional, commented
 def aggregate_positions_of_single_equity(cur, user_id, symbol):
@@ -75,3 +88,49 @@ def aggregate_total_value_of_equity_positions(positions):
 
     return total_equities_value
 
+
+# tested, functional, commented
+def update_positions_in_table(user_id):
+    """ Accepts a user_id and updates every position held by user with a live price. """
+
+    try:
+        with DBCore.get_connection() as conn:
+            with conn.cursor() as cur:
+                
+                # get list of symbols user has open positions of
+                symbols = get_user_equity_symbols(cur, user_id)
+
+                # fill a dict with symbol as key and live price as value
+                symbols_with_live_prices = {}
+                for symbol in symbols:
+                    live_price = live_stock_price(symbol)
+                    symbols_with_live_prices[symbol] = live_price
+
+                # get list of every position user has as a position object
+                positions = get_all_user_positions(cur, user_id)
+
+                # iterate over list, updating last_price_per_share and total_value of position
+                for position in positions:
+                    symbol = position.symbol
+                    live_price = symbols_with_live_prices[symbol]
+                    new_total_value = position.number_of_shares * live_price
+                    position.last_price_per_share = live_price
+                    position.total_value = new_total_value
+                
+                # ensure each position was updated in the positions table
+                if not update_list_of_positions(cur, positions):
+                    return {
+                        "success": False,
+                        "message": "Failed to update list of positions in positions table."
+                    }
+                
+                return {
+                    "success": True,
+                    "message": "Positions successfully updated in positions table."
+                }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error. Failed to update stock prices in table: {e}."
+        }

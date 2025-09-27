@@ -74,7 +74,7 @@ def get_user_positions_of_equity(cur, user_id, symbol):
         # refactor into Stock and then Position objects
         stock = Stock(company_name=company_name, symbol=symbol, price=average_price_per_share)
         position = Position(stock=stock, number_of_shares=number_of_shares, user_id=user_id, 
-                            position_id=position_id, last_price_per_share=last_price_per_share)
+                            position_id=position_id, last_price_per_share=last_price_per_share, total_value=position_total)
 
         positions.append(position)
     
@@ -142,8 +142,11 @@ def update_positions_last_price(cur, user_id, symbol, live_price):
     ))
 
     
-# UNTESTED
+# tested, functional, commented
 def get_all_user_positions(cur, user_id):
+    """ Accepts cursor and user_id, returns list of position objects held by user.
+        Every position is included. """ 
+    
     cur.execute(""" SELECT * FROM positions WHERE user_id=%s """, (user_id,))
 
     rows = cur.fetchall()
@@ -167,10 +170,14 @@ def get_all_user_positions(cur, user_id):
     
     return positions
 
-# UNTESTED
+
+# tested, functional, commented
 def update_list_of_positions(cur, positions):
+    """ Accepts a cursor and list of position objects, updating the last_price_per_share, 
+        number_of_shares and position_total. """  
+    
     for p in positions:
-        cur.execute(""" UDPATE positions SET 
+        cur.execute(""" UPDATE positions SET 
             number_of_shares=%s,
             last_price_per_share=%s,
             position_total=%s

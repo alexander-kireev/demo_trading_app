@@ -20,6 +20,15 @@ from app.utils import  (
     verify_password
 )
 
+
+from app.position.position_service import (
+    update_positions_in_table
+)
+
+from app.position.position_repo import (
+    get_all_user_positions
+)
+
 from app.user.user_model import User
 from datetime import datetime
 
@@ -310,4 +319,5 @@ def withdraw_user_funds(user_id, amount):
         }   
  
 
-# TODO: IMPLEMENT UPDATING OF USER.TOTAL_BALANACE (WHEN PORTFOLIO FUNCTIONALITY IS READY)
+
+

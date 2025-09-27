@@ -37,6 +37,7 @@ class Portfolio:
                 print(f"Symbol : {position.symbol}.")
                 print(f"Company name: {position.company_name}.")
                 print(f"Average price per share: ${position.price_per_share}.")
+                print(f"Live price per share: ${position.last_price_per_share}.")
                 print(f"Number of shares: {position.number_of_shares}.")
                 print(f"Total value: ${position.total_value}")
                 print()

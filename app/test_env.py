@@ -58,25 +58,55 @@ from app.position.position_repo import (
 
 from app.portfolio.portfolio_service import (
     get_portfolio,
-    get_live_portfolio,
     aggregate_positions_of_single_equity,
     aggregate_total_value_of_equity_positions
 )
 
+from app.stock.stock_service import (
+    live_stock_price
+)
 
-user_id = 3
+from app.position.position_service import (
+    update_positions_in_table
+)
 
-symbol = "AAPL"
-price = 256.87
-company_name = "Apple"
-number_of_shares = 5
 
-stock = Stock(company_name=company_name, symbol=symbol, price=price)
+# f_name = "alex"
+# l_name = "smith"
+# dob = "19-05-1999"
+# email = "alex2@email.com"
+# password = "password"
 
-number_of_shares = 4
-# print(buy_stock(user_id=user_id, stock=stock, number_of_shares=number_of_shares))
-# print(sell_stock(stock=stock, number_of_shares=number_of_shares, user_id=user_id))
-portfolio = get_portfolio(3)
 
-portfolio.print_portfolio()
+# print(register_user(f_name, l_name, dob, email, password))
+user_id = 2
+
+# # print(update_positions_in_table(user_id))
+# symbol = "tsla"
+
+# print(sell_stock(user_id, symbol, 1))
+
+# portfolio = get_portfolio(2)
+
+# portfolio.print_portfolio()
+
+# symbol = "tsla"
+# number_of_shares = 5
+
+# print(buy_stock(user_id, symbol, number_of_shares))
+
+# stock = Stock(company_name=company_name, symbol=symbol, price=price)
+
+# number_of_shares = 4
+# # print(buy_stock(user_id=user_id, stock=stock, number_of_shares=number_of_shares))
+# # print(sell_stock(stock=stock, number_of_shares=number_of_shares, user_id=user_id))
+# portfolio = get_portfolio(3)
+
+# portfolio.print_portfolio()
+
+# symbol = "tsla"
+# num_shares = 5
+# user_id = 1
+# print(buy_stock(user_id, symbol, num_shares))
+
 

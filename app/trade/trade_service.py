@@ -24,12 +24,18 @@ from app.position.position_repo import (
     update_positions_last_price
 )
 
+from app.position.position_service import (
+    update_positions_in_table,
+)
+
 from app.stock.stock_service import (
-    live_stock_price
+    live_stock_price,
+    create_stock,
+    create_stocks
 )
 
 # tested, functional, commented
-def buy_stock(user_id, stock, number_of_shares):
+def buy_stock(user_id, symbol, number_of_shares):
     """ Accepts stock object, number of shares to buy, user_id and updates the holdings
         and trades_log tables. """
     
@@ -39,6 +45,9 @@ def buy_stock(user_id, stock, number_of_shares):
                 
                 # get used object
                 user = get_user_by_id(cur, user_id)
+
+                # get live stock object
+                stock = create_stock(symbol)
                 
                 # calculate trade_amount
                 trade_amount = stock.price * number_of_shares
@@ -95,7 +104,7 @@ def buy_stock(user_id, stock, number_of_shares):
             
 
 # tested, functional, commented
-def sell_stock(stock, number_of_shares, user_id):
+def sell_stock(user_id, symbol, number_of_shares):
     """ Accepts stock object, number of shares to sell and user_id. Ensures user has
         sufficient long position(s) open to sell desired number of shares. This function
         DOES NOT allow for short selling. """
@@ -105,7 +114,7 @@ def sell_stock(stock, number_of_shares, user_id):
             with conn.cursor() as cur:
                 
                 # get positions object with list of positions of single stock
-                positions = get_user_positions_of_equity(cur, user_id, stock.symbol)
+                positions = get_user_positions_of_equity(cur, user_id, symbol)
 
                 print(positions.total_number_of_shares)
                 
@@ -121,11 +130,8 @@ def sell_stock(stock, number_of_shares, user_id):
                 total_value_shares_sold = 0
                 position_number = 0
 
-                # get live stock price from API
-                current_stock_price = live_stock_price(stock.symbol)
-
-                # update price in stock object with current price
-                stock.price = current_stock_price
+                # instantiate live stock object
+                stock = create_stock(symbol)
 
                 # run loop while shares remain to be sold
                 while number_of_shares > 0:
@@ -191,7 +197,7 @@ def sell_stock(stock, number_of_shares, user_id):
                 user = get_user_by_id(cur, user_id)
                 
                 # update cash_balance in user object
-                new_user_cash_balance = float(user.cash_balance) + total_value_shares_sold
+                new_user_cash_balance = float(user.cash_balance) + float(total_value_shares_sold)
 
                 # update cash_balance in users table
                 if not update_user_cash_balance(cur, user_id, new_user_cash_balance):

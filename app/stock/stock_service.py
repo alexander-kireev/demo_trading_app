@@ -5,10 +5,21 @@ from app.stock.stock_model import Stock
 
 # tested, functional, commented
 def create_stock(symbol):
-    """ Accepts a stock symbol, fetches live stock price and returns stock object. """
+    """ Accepts a stock symbol, fetches live stock data and returns stock object. """
     
-    info = Ticker(symbol).info
-    return Stock(info["shortName"], symbol, info["regularMarketPrice"])
+    try:
+        
+        # format and retrieve data
+        symbol = symbol.upper()
+        data = Ticker(symbol).info
+        price = data["regularMarketPrice"]
+
+        company_name = data["shortName"]
+        
+        return Stock(company_name, symbol, price)
+    
+    except Exception as e:
+        return None
     
 
 # tested, functional, commented
@@ -29,3 +40,8 @@ def live_stock_price(symbol):
     """ Accepts a symbol of equity and returns a live price from the API. """
 
     return Ticker(symbol).info["regularMarketPrice"]
+
+
+
+    
+
