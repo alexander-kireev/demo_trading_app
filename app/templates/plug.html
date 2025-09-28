@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+
+  
+<div class="row text-center">
+  <h2>heading</h2>
+</div>
+
+  {% if success %}
+    <div class="alert alert-success">
+      {{ success }}
+    </div>
+  {% endif %}
+  
+  {% if error %}
+    <div class="alert alert-danger">
+      {{ error }}
+    </div>
+  {% endif %}
+
+<div class="row">
+
+
+
+</div>
+
+{% endblock %}

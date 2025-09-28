@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}My account{% endblock %}
+
+{% block content %}
+
+  
+<div class="row text-center">
+  <h2>My account</h2>
+</div>
+
+  {% if error %}
+    <div class="alert alert-danger">
+      {{ error }}
+    </div>
+  {% endif %}
+
+<div class="row text-center">
+  <a href="/change_user_details" class="btn btn-primary">Edit personal details</a>
+  <a href="/change_email" class="btn btn-primary">Change email address</a>
+  <a href="/change_password" class="btn btn-primary">Change password</a>
+  <a href="/delete_account" class="btn btn-primary">Delete account</a>
+
+
+
+
+</div>
+
+{% endblock %}

@@ -22,7 +22,8 @@ from app.user.user_service import (
     deposit_user_funds,
     withdraw_user_funds,
     update_user_email,
-    update_user_password
+    update_user_password,
+    get_user
 )
 
 
@@ -79,7 +80,9 @@ from app.position.position_service import (
 
 
 # print(register_user(f_name, l_name, dob, email, password))
-user_id = 2
+id = 2
+
+print(get_user(id))
 
 # # print(update_positions_in_table(user_id))
 # symbol = "tsla"

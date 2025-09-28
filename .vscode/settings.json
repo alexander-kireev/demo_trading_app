@@ -31,5 +31,17 @@
       "id": "0A084634-7717-4513-9309-64A3FAD703EF",
       "isDefault": true
     }
-  ]
+  ],
+
+  // HTML indentation settings
+  "[html]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+
+  // Jinja template indentation (optional, if you install a Jinja extension)
+  "[jinja]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  }
 }
