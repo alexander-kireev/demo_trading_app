@@ -28,10 +28,7 @@ from app.user.user_service import (
 
 
 # table setup modules
-from app.setup.positions_table_setup import define_positions_table
-from app.setup.trades_log_table_setup import define_trades_log_table
-from app.setup.transactions_table_setup import define_transactions_table
-from app.setup.users_table_setup import define_users_table
+
 
 # stock modules
 from app.stock.stock_model import Stock
@@ -80,9 +77,9 @@ from app.position.position_service import (
 
 
 # print(register_user(f_name, l_name, dob, email, password))
-id = 2
+# id = 2
 
-print(get_user(id))
+# print(get_user(id))
 
 # # print(update_positions_in_table(user_id))
 # symbol = "tsla"
@@ -113,3 +110,14 @@ print(get_user(id))
 # print(buy_stock(user_id, symbol, num_shares))
 
 
+
+
+
+from app.setup.positions_table_setup import define_positions_table
+from app.setup.trades_log_table_setup import define_trades_log_table
+from app.setup.transactions_table_setup import define_transactions_table
+from app.setup.users_table_setup import define_users_table
+define_users_table()
+define_positions_table()
+define_trades_log_table()
+define_transactions_table()

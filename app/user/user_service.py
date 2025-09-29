@@ -373,75 +373,44 @@ def get_user(data_point):
         return None
     
 
+# tested, functional, commented
+def update_user_details(user_id, user, first_name=None, last_name=None, dob=None):
+    """ Accepts a user_id, user object and optional user details. Updates users table
+        with new user personal details. """
 
-
-def update_user_details(user_id, first_name=None, last_name=None, dob=None):
+    # establish connection to database
+    conn = DBCore.get_connection()
     
     try:
-
-        with DBCore.get_connection() as conn:
+        with conn:
             with conn.cursor() as cur:
-
-                if first_name:
-                    if not edit_user_first_name(cur, user_id, first_name):
-                        return {
-                            "success": False,
-                            "message": f"Error. Failed updating first name: {e}"
-                        }
-                    
-                if last_name:
-                    if not edit_user_first_name(cur, user_id, last_name):
-                        return {
-                            "success": False,
-                            "message": f"Error. Failed updating last name: {e}"
-                        }
-                    
                 
+                # update first name if required
+                if first_name:
+                    if first_name != user.first_name:
+                        if not insert_user_first_name(cur, user_id, first_name):
+                            raise Exception
+                
+                # update last name if required
+                if last_name:
+                    if last_name != user.last_name:
+                        if not insert_user_last_name(cur, user_id, last_name):
+                            raise Exception
+                
+                # update date of birth if required
                 if dob:
-                    if not edit_user_first_name(cur, user_id, dob):
-                        return {
-                            "success": False,
-                            "message": f"Error. Failed updating date of birth: {e}"
-                        }
-
-                updated_user = get_user_by_id(cur, user_id)
-            
-                return {
+                    if dob != user.dob:
+                        if not insert_user_dob(cur, user_id, dob):
+                            raise Exception
+       
+                return { 
                     "success": True,
-                    "message": updated_user
+                    "message": "User personal details successfully updated"
                 }
 
     except Exception as e:
+        conn.rollback()
         return {
             "success": False,
-            "message": f"Error. Failed updating user details: {e}"
+            "message": f"Error. Failed updating user's personal details: {e}"
         }
-
-
-# use this for the others!
-def update_user_first_name(user_id, first_name):
-
-    try:
-        with DBCore.get_connection() as conn:
-            with conn.cursor() as cur:
-
-                if not insert_user_first_name(cur, user_id, first_name):
-                    return {
-                        "success": False,
-                        "message": f"Failed inserting first name into table users."
-                    }
-  
-    except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error. Failed updating user's first name: {e}"
-        }
-
-
-    return insert_user_first_name(cur, user_id, first_name)
-
-def edit_user_last_name(cur, user_id, last_name):
-    return insert_user_last_name(cur, user_id, last_name)
-
-def edit_user_dob(cur, user_id, dob):
-    return insert_user_dob(cur, user_id, dob)

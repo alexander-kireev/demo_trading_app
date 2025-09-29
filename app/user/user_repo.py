@@ -95,3 +95,32 @@ def update_user_cash_balance(cur, user_id, new_balance):
 
     cur.execute(""" UPDATE users SET cash_balance=%s WHERE id=%s """, (new_balance, user_id))
     return cur.rowcount > 0
+
+
+# tested, functional, commented
+def insert_user_first_name(cur, user_id, first_name):
+    """ Accepts a cursor, user_id and first_name, updates user's first name in table users. """
+
+    cur.execute(""" UPDATE users SET first_name=%s WHERE id=%s """,
+                (first_name, user_id))
+    return cur.rowcount == 1
+
+
+# tested, functional, commented
+def insert_user_last_name(cur, user_id, last_name):
+    """ Accepts a cursor, user_id and last_name, updates user's last name in table users. """
+
+    cur.execute(""" UPDATE users SET last_name=%s WHERE id=%s """,
+                (last_name, user_id))
+    return cur.rowcount == 1
+
+
+# tested, functional, commented
+def insert_user_dob(cur, user_id, dob):
+    """ Accepts a cursor, user_id and first_name, updates user's date of birth in table users. """
+
+    cur.execute(""" UPDATE users SET dob=%s WHERE id=%s """,
+                (dob, user_id))
+    return cur.rowcount == 1
+
+

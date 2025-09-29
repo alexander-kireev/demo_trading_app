@@ -21,9 +21,7 @@ from app.user.user_service import (
     insert_user_password,
     update_user_password,
     delete_user,
-    update_user_first_name,
-    update_user_last_name,
-    update_user_dob
+    update_user_details
 )
 
 from app.user.user_repo import (
@@ -107,6 +105,7 @@ def signup():
             return redirect("/")
         else:
             error = "Sorry, something went wrong. Please try to register again."
+            error = result["message"]
             return render_template("sign_up.html", error=error)
         
 
@@ -245,24 +244,35 @@ def change_user_details():
         last_name = request.form.get("last_name", "").strip()
         dob = request.form.get("dob", "").strip()
 
-        if first_name := valid_first_name(first_name):
-            if not update_user_first_name(user_id, first_name):
-                flash("Failed updating first name. Please try again.", "danger")
-                return redirect("/change_user_details")
+        user_id = session["user_id"]
+        user = get_user(user_id)
 
-        if last_name := valid_last_name(last_name):
-            if not update_user_last_name(user_id, last_name):
-                flash("Failed updating last name. Please try again.", "danger")
-                return redirect("/change_user_details")
-            
-        if dob := valid_dob(dob):
-            if not update_user_dob(user_id, dob):
-                flash("Failed updating date of birth. Please try again.", "danger")
-                return redirect("/change_user_details")
 
-        flash("Your personal details have been successfully updated.")
+        first_name = valid_first_name(first_name)
+        last_name = valid_last_name(last_name)
+        dob = valid_dob(dob)
+        
+        if not first_name:
+            flash("Please enter a valid first name.")
+            return redirect("/change_user_details")
+        
+        if not last_name:
+            flash("Please enter a valid last name.")
+            return redirect("/change_user_details")
+        
+        if not dob:
+            flash("Please enter a valid date of birth.")
+            return redirect("/change_user_details")
+                
+        result = update_user_details(user_id=user_id, user=user, first_name=first_name,
+                                     last_name=last_name, dob=dob)
+        
+        if not result["success"]:
+            flash("Sorry, something went wrong. Please try again.")
+        else:
+            flash("Your personal details have been successfully updated.")
+
         return redirect("/change_user_details")
-
 
     else:
         user_id = session["user_id"]
@@ -274,7 +284,7 @@ def change_user_details():
 
         return render_template("change_user_details.html", 
                                first_name=first_name, last_name=last_name, dob=dob)
-    return
+   
 
 # tested, functional, commented
 @app.route("/delete_account", methods=["GET", "POST"])
@@ -321,6 +331,7 @@ def delete_account():
 
 if __name__ == "__main__":
     app.secret_key = os.getenv("SECRET_KEY")
+    print("SECRET KEY LOADED:", repr(app.secret_key))
     app.run(debug=True)
 
 

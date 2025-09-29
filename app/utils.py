@@ -55,13 +55,19 @@ def validate_registration_data(data):
     return None
 
 def valid_first_name(first_name):
-    return True
+    try:
+        return first_name.lower()
+    except (ValueError, TypeError):
+        return None
 
 def valid_last_name(last_name):
-    return True
+    try:
+        return last_name.lower()
+    except (ValueError, TypeError):
+        return None
 
 def valid_dob(dob):
-    return True
+    return dob
 
 def valid_email(email):
     return True
