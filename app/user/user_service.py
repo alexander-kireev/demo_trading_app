@@ -219,16 +219,17 @@ def update_user_password(user_id, new_password_hash):
 # tested, functional, commented
 def deposit_user_funds(user_id, amount):
     """ Accepts a user_id and amount to deposit, updates the users table with the new cash balance. """
+    conn = DBCore.get_connection()
 
     try:
-        with DBCore.get_connection() as conn:
+        with conn:
             with conn.cursor() as cur:
 
                 # get user object
                 user = get_user_by_id(cur, user_id)
 
                 # calculate new user cash_balance
-                new_balance = user.cash_balance + amount
+                new_balance = float(user.cash_balance) + amount
 
                 # ensure cash_balance was updated in users table
                 if not update_user_cash_balance(cur, user_id, new_balance):
@@ -255,6 +256,7 @@ def deposit_user_funds(user_id, amount):
                 }
 
     except Exception as e:
+        conn.rollback()
         return {
                 "success": False,
                 "message": f"Error. Failed to deposit funds: {e}."
@@ -273,7 +275,7 @@ def withdraw_user_funds(user_id, amount):
                 user = get_user_by_id(cur, user_id)
 
                 # calculate new user cash_balance
-                new_balance = user.cash_balance - amount
+                new_balance = float(user.cash_balance) - amount
 
                 # ensure balance is positive, meaning user has sufficient funds to withdraw
                 if new_balance < 0:

@@ -191,3 +191,18 @@ def update_list_of_positions(cur, positions):
         ))
     
     return cur.rowcount > 0
+
+
+
+def user_has_position_of_symbol(cur, user_id, symbol):
+    cur.execute(""" SELECT * FROM positions WHERE user_id=%s and symbol=%s """,
+                (user_id, symbol))
+    
+    return cur.rowcount > 0
+
+
+
+
+
+
+

@@ -21,8 +21,10 @@
           <ul class="navbar-nav ms-auto">
           {% if session.get("user_id") %}
               <li class="nav-item"><a class="nav-link" href="/portfolio">Portfolio</a></li>
-              <li class="nav-item"><a class="nav-link" href="/trades">Trades</a></li>
+              <li class="nav-item"><a class="nav-link" href="/market">Market</a></li>
+              <li class="nav-item"><a class="nav-link" href="/trade_history">Trade History</a></li>
               <li class="nav-item"><a class="nav-link" href="/account">Account</a></li>
+              <li class="nav-item"><a class="nav-link" href="/my_details">My details</a></li>
               <li class="nav-item"><a class="nav-link" href="/log_out">Logout</a></li>
           {% else %}
               <li class="nav-item"><a class="nav-link" href="/log_in">About us</a></li>

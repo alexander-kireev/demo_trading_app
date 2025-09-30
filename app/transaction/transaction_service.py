@@ -1,5 +1,7 @@
 from app.db_core import DBCore
 
+from datetime import datetime, timedelta
+
 from app.transaction.transaction_repo import (
     get_transactions
 )
@@ -13,17 +15,24 @@ def get_user_transaction_history(user_id, start_date=None, end_date=None):
         with DBCore.get_connection() as conn:
             with conn.cursor() as cur:
 
+                # format end date to catch all trades until end of day
+                if end_date:
+                    end_date = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
+
                 # get list of transaction objects from transactions table
                 transactions_list = get_transactions(cur, user_id, start_date, end_date)
 
                 # ensure list exists
                 if len(transactions_list) < 1:
                     return {
-                        "success": True,
+                        "success": False,
                         "message": "User has no transactions to date."
                     }
-
-                return transactions_list
+                else:
+                    return {
+                        "success": True,
+                        "message": transactions_list
+                    }
             
     except Exception as e:
         return {

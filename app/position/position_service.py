@@ -3,7 +3,8 @@ from app.db_core import DBCore
 from app.position.position_repo import (
     get_user_equity_symbols,
     get_user_positions_of_equity,
-    get_user_single_position_of_equity
+    get_user_single_position_of_equity,
+    user_has_position_of_symbol
 )
 from app.stock.stock_model import Stock
 
@@ -20,6 +21,39 @@ from app.position.position_repo import (
 from app.stock.stock_service import (
     live_stock_price
 )
+
+# NOT TESTED
+def get_user_position_by_symbol(user_id, symbol):
+    
+    try:
+        with DBCore.get_connection() as conn:
+            with conn.cursor() as cur:
+
+                if user_has_position_of_symbol(cur, user_id, symbol):
+                    result = aggregate_positions_of_single_equity(cur, user_id, symbol)
+                    
+                    if result:
+                        return {
+                            "success": True,
+                            "message": result
+                        }
+                    else:
+                        return {
+                            "success": False,
+                            "message": "Failed to get user's positions of equity."
+                        }
+                    
+                return {
+                    "success": False,
+                    "message": f"User has no open positions of: {symbol}."
+                }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error. Failed to get user's positions of equity: {e}."
+        }
+
 
 # tested, functional, commented
 def aggregate_positions_of_single_equity(cur, user_id, symbol):

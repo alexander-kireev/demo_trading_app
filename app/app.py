@@ -8,8 +8,26 @@ from flask import (
     flash
 )
 
-from functools import wraps
+from app.exchange_data.exchange_service import (
+    ALL_SYMBOLS
+)
 
+
+
+from app.trade.trade_service import (
+    buy_stock,
+    sell_stock,
+    get_user_trade_history
+)
+
+from app.portfolio.portfolio_model import Portfolio
+
+from app.portfolio.portfolio_service import (
+    get_portfolio
+)
+
+from functools import wraps
+from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 
@@ -21,7 +39,22 @@ from app.user.user_service import (
     insert_user_password,
     update_user_password,
     delete_user,
-    update_user_details
+    update_user_details,
+    deposit_user_funds,
+    withdraw_user_funds
+)
+
+from app.transaction.transaction_service import (
+    get_user_transaction_history
+)
+
+from app.position.position_model import Position
+
+from app.position.position_service import (
+    aggregate_all_equity_positions,
+    aggregate_positions_of_single_equity,
+    aggregate_total_value_of_equity_positions,
+    get_user_position_by_symbol
 )
 
 from app.user.user_repo import (
@@ -39,10 +72,20 @@ from app.utils import (
     valid_email,
     valid_first_name,
     valid_last_name,
-    valid_password
+    valid_password,
+    valid_deposit_amount
 )
+
+from app.stock.stock_model import Stock
+
+from app.stock.stock_service import (
+    create_stock,
+    create_stocks
+)
+
 load_dotenv()
 app = Flask(__name__)
+
 
 
 def login_required(f):
@@ -60,31 +103,45 @@ def home():
     return render_template("index.html")
 
 
-# tested, functional
+# tested, functional, commented
 @app.route("/log_in", methods=["GET", "POST"])
 def log_in():
+
+    # POST request
     if request.method == "POST":
+
+        # get input
         email = request.form["email"]
         password = request.form["password"]
 
+        # log user in
         result = authenticate_user(email, password)
 
+        # log user in if authentication was successful
         if result["success"]:
             user = result["message"]
             session["user_id"] = user.id
             return redirect("/")
+        
+        # TODO: FIX THIS (RETURN REDIRECT, NOT RENDER TEMPLATE)
+        # if authetication was unsuccessful, display message
         else:
             error = result["message"]
             return render_template("log_in.html", error=error)
-              
-    return render_template("log_in.html")
+
+    # GET  request
+    else:   
+        return render_template("log_in.html")
 
 
-
-# tested, functional
+# tested, functional, commented
 @app.route("/sign_up", methods=["GET", "POST"])
 def signup():
+
+    # POST method
     if request.method == "POST":
+
+        # collect input into object
         data = {
             "first_name": request.form["first_name"],
             "last_name": request.form["last_name"],
@@ -94,22 +151,30 @@ def signup():
             "second_password": request.form["second_password"]
         }
         
+        # validate input
         error = validate_registration_data(data)
         if error:
             return render_template("sign_up.html", error=error)
 
+        # register user
         result = register_user(data)
+
+        # if registration was successful, log user in
         if result["success"]:
             user = result["message"]
             session["user_id"] = user.id
             return redirect("/")
+        
+        # TODO: THIS NEEDS FIXING (WITH REDIRECT, NOT RENDER TEMPLATE)
+        # if registration was unsuccessful, display message
         else:
             error = "Sorry, something went wrong. Please try to register again."
             error = result["message"]
             return render_template("sign_up.html", error=error)
-        
 
-    return render_template("sign_up.html")
+    # GET request   
+    else:
+        return render_template("sign_up.html")
 
 
 # tested, functional
@@ -121,10 +186,10 @@ def log_out():
 
 
 # tested, functional
-@app.route("/account")
+@app.route("/my_details")
 @login_required
-def account():
-    return render_template("account.html")
+def my_details():
+    return render_template("my_details.html")
 
 
 # tested, functional, commented
@@ -177,7 +242,6 @@ def change_email():
         user = get_user(user_id)
         
         return render_template("change_email.html", current_email=user.email)
-
 
 
 # tested, functional, commented
@@ -234,56 +298,58 @@ def change_password():
         return render_template("change_password.html")
 
 
-# TODO: CHECK THIS! NOT TESTED AT ALL!
+# tested, functional, commented
 @app.route("/change_user_details", methods=["GET", "POST"])
 @login_required
 def change_user_details():
 
+    # get user object
+    user_id = session["user_id"]
+    user = get_user(user_id)
+
+    # POST request
     if request.method == "POST":
+
+        # get input
         first_name = request.form.get("first_name", "").strip()
         last_name = request.form.get("last_name", "").strip()
         dob = request.form.get("dob", "").strip()
 
-        user_id = session["user_id"]
-        user = get_user(user_id)
-
-
+        # validate and format input
         first_name = valid_first_name(first_name)
         last_name = valid_last_name(last_name)
         dob = valid_dob(dob)
-        
+
+        # ensure all input provided exists and is valid
         if not first_name:
             flash("Please enter a valid first name.")
             return redirect("/change_user_details")
-        
         if not last_name:
             flash("Please enter a valid last name.")
             return redirect("/change_user_details")
-        
         if not dob:
             flash("Please enter a valid date of birth.")
             return redirect("/change_user_details")
-                
+
+        # update user details in users table        
         result = update_user_details(user_id=user_id, user=user, first_name=first_name,
                                      last_name=last_name, dob=dob)
         
+        # if update was unsuccessful
         if not result["success"]:
             flash("Sorry, something went wrong. Please try again.")
+        # if update was successful
         else:
             flash("Your personal details have been successfully updated.")
 
         return redirect("/change_user_details")
 
+    # GET request
     else:
-        user_id = session["user_id"]
-        user = get_user(user_id)
 
-        first_name = user.first_name
-        last_name = user.last_name
-        dob = user.dob
-
-        return render_template("change_user_details.html", 
-                               first_name=first_name, last_name=last_name, dob=dob)
+        # render html with user details
+        return render_template("change_user_details.html", first_name=user.first_name, 
+                               last_name=user.last_name, dob=user.dob)
    
 
 # tested, functional, commented
@@ -329,11 +395,209 @@ def delete_account():
 
 
 
+@app.route("/market", methods=["GET", "POST"])
+@login_required
+def market():
+
+    if request.method == "POST":
+        return render_template("market.html")
+    else:
+        
+        symbol = request.args.get("ticker", "").strip().lower()
+        
+
+        if len(symbol) > 0:
+            
+            
+            if symbol.upper() not in ALL_SYMBOLS:
+                flash("Please enter a valid ticker.", "danger")
+                return redirect("/market")
+            
+            stock = create_stock(symbol)
+
+            if not stock:
+                flash("Something went wrong. Please try again.", "danger")
+                return redirect("/market")
+            
+            # FETCH USER DATA
+            user_id = session["user_id"]
+            result = get_user_position_by_symbol(user_id, symbol)
+
+            if result["success"]:
+                position = result["message"]
+
+                shares_held = position.number_of_shares
+                average_price_per_share = position.price_per_share
+                total_position_value = position.total_value
+            
+            else:
+                shares_held = 0
+                average_price_per_share = 0.00
+                total_position_value = 0.00
+            
+            return render_template("market.html", stock=stock, shares_held=shares_held,
+                                   average_price_per_share=average_price_per_share, total_position_value=total_position_value)
+
+        return render_template("market.html")
+
+
+@app.route("/place_order", methods=["POST"])
+@login_required
+def place_order():
+
+    if request.method == "POST":
+
+        action = request.form.get("action")
+        symbol = request.form.get("display_stock_symbol").strip().lower()
+        
+        user_id = session["user_id"]
+
+        try:
+            num_shares = int(request.form.get("order_amount"))
+        except (ValueError, TypeError):
+            flash("Please enter a valid number of shares.", "danger")
+            return redirect("/market")
+
+        if not num_shares:
+            flash("Please enter a valid number of shares.", "danger")
+            return redirect("/market")
+        
+        if num_shares < 1 or num_shares > 100000:
+            flash("Please enter a valid number of shares.", "danger")
+            return redirect("/market")
+
+        if symbol.upper() not in ALL_SYMBOLS:
+            flash("Something went wrong. Please try again.", "danger")
+            return redirect("/market")
+        
+        stock = create_stock(symbol)
+
+        if not stock:
+            flash("Something went wrong. Please try again.", "danger")
+            return redirect("/market")
+
+        
+
+        if action == "BUY":
+            result = buy_stock(user_id, symbol, num_shares)
+            if result["success"]:
+                flash("Shares purchased successfully.", "success")
+            else:
+                flash("Failed to purchase shares.", "danger")
+
+
+        elif action == "SELL":
+            result = sell_stock(user_id, symbol, num_shares)
+            if result["success"]:
+                flash("Shares sold successfully.", "success")
+            else:
+                flash("Failed to sell shares.", "danger")
+        
+        else:
+            flash("Invalid action. Please try again.", "danger")
+            return redirect("/market")
+        
+        return redirect("/market")
+        
+
+
+
+@app.route("/portfolio", methods=["GET"])
+@login_required
+def portfolio():
+
+    if request.method == "GET":
+
+        user_id = session["user_id"]
+        portfolio = get_portfolio(user_id)
+        
+
+        
+
+        return render_template("portfolio.html", portfolio=portfolio)
+
+
+
+
+@app.route("/trade_history", methods=["GET"])
+@login_required
+def trade_history():
+
+    if request.method == "GET":
+
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+
+        user_id = session["user_id"]
+
+        result = get_user_trade_history(user_id, start_date, end_date)
+
+        if result["success"]:
+            trades = result["message"]
+        else:
+            flash(result["message"], "danger")
+            trades = []
+
+
+        return render_template("trade_history.html", trades=trades)
+
+
+
+@app.route("/account", methods=["GET"])
+@login_required
+def account():
+
+    if request.method == "GET":
+
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+
+        user_id = session["user_id"]
+        
+        result = get_user_transaction_history(user_id, start_date, end_date)
+
+        if result["success"]:
+            transactions = result["message"]
+        else:
+            flash(result["message"], "danger")
+            transactions = []
+
+        return render_template("account.html", transactions=transactions)
+
+
+@app.route("/deposit_funds", methods=["POST"])
+@login_required
+def deposit_funds():
+
+    if request.method == "POST":
+
+        deposit_amount = request.form.get("deposit_amount")
+
+        deposit_amount = valid_deposit_amount(deposit_amount)
+
+        if not deposit_amount:
+            flash("Please enter a valid deposit amount." "danger")
+            return redirect("/account")
+        
+
+        user_id = session["user_id"]
+
+        result = deposit_user_funds(user_id, deposit_amount)
+
+        if result["success"]:
+            flash(result["message"], "success")
+        else:
+            flash(result["message"], "danger")
+            return redirect("/account")
+        
+        return redirect("/account")
+
+
+
+        
+
 if __name__ == "__main__":
     app.secret_key = os.getenv("SECRET_KEY")
-    print("SECRET KEY LOADED:", repr(app.secret_key))
     app.run(debug=True)
-
-
 
 

@@ -77,3 +77,12 @@ def valid_password(password):
 
 def passwords_match(password_1, password_2):
     return password_1 == password_2
+
+
+def valid_deposit_amount(amount):
+
+    try:
+        amount = float(amount)
+        return amount > 10 and amount < 1000000
+    except (ValueError, TypeError):
+        return False

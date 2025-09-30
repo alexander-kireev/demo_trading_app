@@ -5,6 +5,7 @@ from app.user.user_repo import (
 )
 
 from app.user.user_model import User
+from datetime import datetime, timedelta
 
 from app.trade.trade_model import Trade
 from app.trade.trade_repo import (
@@ -39,8 +40,10 @@ def buy_stock(user_id, symbol, number_of_shares):
     """ Accepts stock object, number of shares to buy, user_id and updates the holdings
         and trades_log tables. """
     
+    conn = DBCore.get_connection()
+    
     try:
-        with DBCore.get_connection() as conn:
+        with conn:
             with conn.cursor() as cur:
                 
                 # get used object
@@ -216,6 +219,7 @@ def sell_stock(user_id, symbol, number_of_shares):
                     }
         
     except Exception as e:
+        conn.rollback()
         return {
             "success": False,
             "message": (f"Error. Failed to sell shares: {e}.")
@@ -231,6 +235,10 @@ def get_user_trade_history(user_id, start_date=None, end_date=None):
         with DBCore.get_connection() as conn:
             with conn.cursor() as cur:
 
+                # format end date to catch all trades until end of day
+                if end_date:
+                    end_date = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
+
                 # get list of trade objects from trades_log table
                 trades_list = get_trades(cur, user_id, start_date, end_date)
 
@@ -240,8 +248,11 @@ def get_user_trade_history(user_id, start_date=None, end_date=None):
                         "success": False,
                         "message": "Failed to retrieve user trades from trades_log table."
                     }
-
-                return trades_list
+                else:
+                    return {
+                        "success": True,
+                        "message": trades_list
+                    }
             
     except Exception as e:
         return {

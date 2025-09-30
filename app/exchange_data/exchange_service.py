@@ -109,3 +109,18 @@ def load_amex_tickers():
     
     # return df as a list
     return df["Symbol"].tolist()
+
+
+# tested, functional, commented
+def get_all_symbols():
+    """ Loads the symbols of companies traded on the NASDAQ, NYSE AND AMEX and returns
+        them as a set. """
+
+    nasdaq = set(load_nasdaq_tickers())
+    nyse = set(load_nyse_tickers())
+    amex = set(load_amex_tickers())
+
+    return nasdaq | nyse | amex
+
+
+ALL_SYMBOLS = get_all_symbols()

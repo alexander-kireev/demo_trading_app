@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+
+<div class="row text-center">
+  <h2>My portfolio</h2>
+</div>
+
+<div class="row bg-dark">
+
+  <div class="col-8 bg-light">
+
+    <div class="row text-center">
+      <h3>My holdings</h3>
+    </div>
+
+    <div class="row m-2">
+      <p><strong>Cash Balance:</strong> ${{ portfolio.cash_balance }}</p>
+      <p><strong>Total Portfolio Value:</strong> ${{ portfolio.portfolio_value }}</p>
+    </div>
+
+    {% if portfolio.positions %}
+    <div class="row m-2">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Company</th>
+            <th>Avg Cost</th>
+            <th>Current Price</th>
+            <th>Shares</th>
+            <th>Position Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for position in portfolio.positions.values() %}
+          <tr>
+            <td>{{ position.symbol }}</td>
+            <td>{{ position.company_name }}</td>
+            <td>${{ position.price_per_share }}</td>
+            <td>${{ position.last_price_per_share }}</td>
+            <td>{{ position.number_of_shares }}</td>
+            <td>${{ position.total_value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="row m-2">
+      <p>You currently hold no equities.</p>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div class="col-4 bg-warning">
+
+    <div class="row text-center">
+      <h3>Actions</h3>
+    </div>
+
+    <div class="row text-center">
+      <a href="/market" class="btn btn-danger">Buy / Sell stocks</a>
+    </div>
+
+    <div class="row text-center">
+      <a href="/deposit_funds" class="btn btn-danger">Deposit funds</a>
+    </div>
+
+    <div class="row text-center">
+      <a href="/withdraw_funds" class="btn btn-danger">Withdraw funds</a>
+    </div>
+
+    <div class="row text-center">
+      <a href="/account_history" class="btn btn-danger">See account history</a>
+    </div>
+
+    <div class="row text-center">
+      <a href="/trade_history" class="btn btn-danger">See trade history</a>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

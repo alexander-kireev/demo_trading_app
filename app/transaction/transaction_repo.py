@@ -9,9 +9,12 @@ def get_transactions(cur, user_id, start_date, end_date):
 
     # take path depending on whether start and end date were provided
     if start_date and end_date:
-        return
+        cur.execute(""" SELECT * FROM transactions WHERE user_id=%s 
+                    AND timestamp >= %s AND timestamp <= %s 
+                    ORDER BY timestamp DESC """, (user_id, start_date, end_date))
     else:
-        cur.execute(""" SELECT * FROM transactions WHERE user_id=%s """, (user_id,))
+        cur.execute(""" SELECT * FROM transactions WHERE user_id=%s 
+                    ORDER BY timestamp """, (user_id,))
 
     rows = cur.fetchall()
     transactions_list = []

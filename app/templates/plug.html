@@ -9,17 +9,16 @@
   <h2>heading</h2>
 </div>
 
-  {% if success %}
-    <div class="alert alert-success">
-      {{ success }}
-    </div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ msg }}
+      </div>
+    {% endfor %}
   {% endif %}
-  
-  {% if error %}
-    <div class="alert alert-danger">
-      {{ error }}
-    </div>
-  {% endif %}
+{% endwith %}
+
 
 <div class="row">
 

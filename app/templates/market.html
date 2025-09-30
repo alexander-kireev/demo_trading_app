@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Market{% endblock %}
+
+{% block content %}
+
+  
+<div class="row text-center">
+  <h2>Market</h2>
+</div>
+
+
+
+
+<div class="row text-center">
+
+  <div class="col">
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="/market" method="GET">
+      <div class="row m-1">
+        <label for="ticker" class="col-sm-4 col-form-label">Enter stock symbol:</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="ticker" name="ticker">
+        </div>
+      </div>
+      
+  
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+  </div>
+
+
+  <div class="col">
+      <form action="/place_order" method="POST">
+
+        <div class="row m-1">
+          <label for="display_stock_symbol" class="col-sm-4 col-form-label">Stock symbol:</label>
+          <div class="col-sm-8">
+            <input type="text" readonly class="form-control-plaintext" id="display_stock_symbol" 
+            name="display_stock_symbol" value="{{ stock.symbol if stock else '' }}">
+          </div>
+        </div>
+
+        <div class="row m-1">
+          <label for="display_company_name" class="col-sm-4 col-form-label">Company name:</label>
+          <div class="col-sm-8">
+            <input type="text" readonly class="form-control-plaintext" id="display_company_name" 
+            name="display_company_name" value="{{ stock.company_name if stock else '' }}">
+          </div>
+        </div>
+
+        <div class="row m-1">
+          <label for="display_shares_held" class="col-sm-4 col-form-label">Shares held:</label>
+          <div class="col-sm-8">
+            <input type="number" readonly class="form-control-plaintext" id="display_shares_held" 
+            name="display_shares_held" value="{{ shares_held }}">
+          </div>
+        </div>
+
+        <div class="row m-1">
+          <label for="display_average_price_per_share" class="col-sm-4 col-form-label">Average cost per share:</label>
+          <div class="col-sm-8">
+            <input type="number" readonly class="form-control-plaintext" id="display_average_price_per_share" 
+            name="display_average_price_per_share" value="{{ average_price_per_share }}">
+          </div>
+        </div>
+
+        <div class="row m-1">
+          <label for="display_total_position_value" class="col-sm-4 col-form-label">Total position value:</label>
+          <div class="col-sm-8">
+            <input type="number" readonly class="form-control-plaintext" id="display_total_position_value" 
+            name="display_total_position_value" value="{{ total_position_value }}">
+          </div>
+        </div>
+
+        <div class="row m-1">
+          <label for="display_current_price" class="col-sm-4 col-form-label">Current price:</label>
+          <div class="col-sm-8">
+            <input type="number" readonly class="form-control-plaintext" id="display_current_price" 
+            name="display_current_price" value="{{ stock.price if stock else '' }}">
+          </div>
+        </div>
+
+
+        <div class="row m-1">
+          <label for="order_amount" class="col-sm-4 col-form-label">Number of shares:</label>
+          <div class="col-sm-8">
+            <input type="number" min="1" max="100000" class="form-control" required id="order_amount" name="order_amount">
+          </div>
+        </div>
+
+        <div class="row m-1">
+
+          <div class="col">
+            <button type="submit" name="action" value="BUY" class="btn btn-success me-2">Buy</button>
+          </div>
+
+
+          <div class="col">
+            <button type="submit" name="action" value="SELL" class="btn btn-danger">Sell</button>
+          </div>
+
+        </div>
+
+          
+        
+        
+    </form>
+
+
+  </div>
+
+
+
+</div>
+
+
+{% endblock %}

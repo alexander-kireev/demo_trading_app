@@ -35,9 +35,13 @@ def get_trades(cur, user_id, start_date, end_date):
 
     # take path depending on whether start and end date were provided
     if start_date and end_date:
-        return
+        cur.execute(""" SELECT * FROM trades_log 
+            WHERE user_id = %s AND date >= %s AND date <= %s
+            ORDER BY date DESC
+        """, (user_id, start_date, end_date)
+        )
     else:
-        cur.execute(""" SELECT * FROM trades_log WHERE user_id=%s """, (user_id,))
+        cur.execute(""" SELECT * FROM trades_log WHERE user_id=%s ORDER BY date DESC """, (user_id,))
 
     rows = cur.fetchall()
     trades_list = []
