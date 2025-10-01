@@ -33,7 +33,7 @@
           {% endwith %}
 
           <!-- Date Filter -->
-          <form action="/trade_history" method="GET" class="row g-3 mb-4">
+          <form action="/trades" method="GET" class="row g-3 mb-4">
             <div class="col-md-5">
               <label for="start_date" class="form-label">Start date</label>
               <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.start_date }}">

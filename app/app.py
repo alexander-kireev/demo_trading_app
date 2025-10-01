@@ -548,7 +548,6 @@ def sample_market():
         return render_template("sample_market.html")
 
 
-
 # tested, functional, commented
 @app.route("/place_order", methods=["POST"])
 @login_required
@@ -785,8 +784,8 @@ def trade_history():
         trades_result = get_user_trade_history(user_id, start_date, end_date)
 
     if not trades_result["success"]:
-        flash(trades_result["message"], "danger")
-        return redirect(url_for("dashboard"))
+        flash("No trades found for the selected period.", "danger")
+        return redirect("/trades")
 
     trades = trades_result["message"]  
 
@@ -809,7 +808,7 @@ def transaction_history():
         tx_result = get_user_transaction_history(user_id, start_date, end_date)
 
     if not tx_result["success"]:
-        flash(tx_result["message"], "danger")
+        flash("No transactions found for the selected period.", "danger")
         return redirect("/account")
 
     transactions = tx_result["message"]
