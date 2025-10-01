@@ -1,0 +1,182 @@
+/* =========================
+   COLOUR VARIABLES
+   ========================= */
+:root {
+  --color-primary: #636059;    /* gunmetal gray */
+  --color-secondary: #f2f1f0; /* cream */
+  --color-accent: #a39d92;    /* sage green */
+  --color-neutral: #c0c9cc;   /* pewter */
+  --color-background: #ffffff;
+  --color-text: #000000;
+}
+
+/* =========================
+   GLOBAL STYLES
+   ========================= */
+body {
+  background-color: var(--color-secondary);
+  color: #222; /* darker for readability */
+  font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+  font-size: 1.05rem; /* slightly larger base font */
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.text-muted {
+  color: #555 !important; /* stronger muted text */
+}
+
+/* =========================
+   NAVBAR
+   ========================= */
+.navbar {
+  background-color: var(--color-primary) !important;
+}
+.navbar-brand {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #fff !important;
+}
+.navbar-nav .nav-link {
+  font-size: 1.2rem;
+  color: #fff !important;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+.navbar-nav .nav-link:hover {
+  color: var(--color-accent) !important;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+footer {
+  background-color: var(--color-primary);
+  color: #fff;
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+.btn-primary {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+.btn-primary:hover {
+  background-color: #7d776d; /* darker sage */
+  border-color: #7d776d;
+}
+
+.btn-secondary {
+  background-color: var(--color-neutral);
+  border-color: var(--color-neutral);
+  color: var(--color-text);
+}
+.btn-secondary:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* Themed Buy button */
+.btn-buy {
+  background-color: #4e7d4e;  /* muted forest green */
+  border-color: #4e7d4e;
+  color: var(--color-text);
+}
+.btn-buy:hover {
+  background-color: #3d623d;  /* darker green on hover */
+  border-color: #3d623d;
+  color: #fff;
+}
+
+/* Themed Sell button */
+.btn-sell {
+  background-color: #b85c5c; /* muted warm red */
+  border-color: #b85c5c;
+  color: var(--color-text);
+}
+.btn-sell:hover {
+  background-color: #9c4747; /* darker muted red */
+  border-color: #9c4747;
+  color: #fff;
+}
+
+
+
+
+/* =========================
+   TABLES
+   ========================= */
+.table thead {
+  background-color: var(--color-neutral);
+  color: var(--color-text);
+  font-weight: 600;
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--color-secondary);
+}
+.table-striped > tbody > tr:hover {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+/* =========================
+   CARDS
+   ========================= */
+.card {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-neutral);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  background-color: var(--color-accent); /* sage green */
+  color: var(--color-text);           /* gunmetal gray text */
+  font-weight: 600;
+}
+
+
+/* =========================
+   ALERTS
+   ========================= */
+/* Success alert (buy confirmation) */
+.alert-success {
+  background-color: #e3f1e3;    /* very light green background */
+  border-color: #4e7d4e;       /* same muted green as Buy button */
+  color: #2f4e2f;              /* dark green text */
+  font-weight: 500;
+}
+
+/* Danger alert (sell failure, errors) */
+.alert-danger {
+  background-color: #f9e6e6;   /* soft light red */
+  border-color: #b85c5c;       /* same muted red as Sell button */
+  color: #5a1f1f;              /* dark muted red text */
+  font-weight: 500;
+}
+
+/* Warning alert */
+.alert-warning {
+  background-color: #fff8e1;   /* pale yellow */
+  border-color: #e6c87a;
+  color: #7d5e00;
+  font-weight: 500;
+}
+
+/* Info alert */
+.alert-info {
+  background-color: #eef3f7;   /* soft pewter/blueish tint */
+  border-color: var(--color-neutral);
+  color: var(--color-primary);
+  font-weight: 500;
+}

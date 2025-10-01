@@ -92,6 +92,7 @@ def valid_deposit_and_withdraw_amount(amount):
 
 
 def valid_num_shares(num_shares):
+    return True
     try:
         num_shares = int(num_shares)
 

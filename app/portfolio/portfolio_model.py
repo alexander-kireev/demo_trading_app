@@ -12,6 +12,7 @@ class Portfolio:
         # if user has no open equity positions
         else:
             self.positions = None
+            self.positions_value = 0
             self.portfolio_value = float(self.cash_balance)
     
     # prints portfolio. this is more of a testing function for now

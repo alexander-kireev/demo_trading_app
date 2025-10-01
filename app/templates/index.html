@@ -3,10 +3,77 @@
 {% block title %}Home - Trading App{% endblock %}
 
 {% block content %}
-  <div class="text-center">
-    <h1 class="mb-3">Welcome to the Trading App</h1>
-    <p class="lead">Track stocks, manage trades, and view your portfolio in one place.</p>
-    <a class="btn btn-primary" href="/portfolio">View Portfolio</a>
-    <a class="btn btn-secondary" href="/stocks">Search Stocks</a>
+<div class="container my-5">
+
+  <!-- Hero Section -->
+  <div class="row align-items-center mb-5">
+    <!-- Text -->
+    <div class="col-md-6 text-center text-md-start">
+      <h1 class="fw-bold mb-3">Welcome to the Trading App</h1>
+      <p class="lead text-muted mb-4">
+        Track stocks, manage trades, and view your portfolio — all in one place.  
+        Designed for speed, clarity, and simplicity.
+      </p>
+      <a class="btn btn-primary btn-lg me-2" href="/log_in">View Portfolio</a>
+      <a class="btn btn-secondary btn-lg" href="/sample_market">Search Stocks</a>
+    </div>
+    <!-- Image -->
+    <div class="col-md-6 text-center">
+      <img src="{{ url_for('static', filename='img/trading_dashboard.svg') }}" 
+           class="img-fluid rounded" 
+           alt="Trading dashboard illustration">
+    </div>
   </div>
+
+  <!-- Feature Highlights -->
+  <div class="row text-center mb-5">
+    <div class="col-md-4">
+      <i class="bi bi-bar-chart-line fs-1 text-primary mb-3"></i>
+      <h5 class="fw-bold">Real-Time Prices</h5>
+      <p class="text-muted">Stay updated with live stock data pulled directly from the market.</p>
+    </div>
+    <div class="col-md-4">
+      <i class="bi bi-wallet2 fs-1 text-primary mb-3"></i>
+      <h5 class="fw-bold">Portfolio Management</h5>
+      <p class="text-muted">Easily track your holdings, positions, and overall performance.</p>
+    </div>
+    <div class="col-md-4">
+      <i class="bi bi-graph-up-arrow fs-1 text-primary mb-3"></i>
+      <h5 class="fw-bold">Trade Simulation</h5>
+      <p class="text-muted">Practice trading without risk and refine your strategies.</p>
+    </div>
+  </div>
+
+  <!-- Cards Row -->
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">Explore the Market</h5>
+          <p class="card-text">Search stocks, check prices, and discover new opportunities.</p>
+          <a href="/log_in" class="btn btn-primary">Go to Market</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">View Your Trades</h5>
+          <p class="card-text">Browse your trade history and download PDF reports.</p>
+          <a href="/log_in" class="btn btn-primary">Trade History</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">Manage Your Account</h5>
+          <p class="card-text">Deposit, withdraw, and keep track of your cash balance.</p>
+          <a href="/log_in" class="btn btn-primary">My Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 {% endblock %}

@@ -1,89 +1,84 @@
 {% extends "base.html" %}
 
-{% block title %}Log in{% endblock %}
+{% block title %}My Portfolio{% endblock %}
 
 {% block content %}
+<div class="container my-5">
 
-<div class="row text-center">
-  <h2>My portfolio</h2>
-</div>
-
-<div class="row bg-dark">
-
-  <div class="col-8 bg-light">
-
-    <div class="row text-center">
-      <h3>My holdings</h3>
+  <!-- Heading -->
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h2 class="fw-bold text-uppercase text-dark">My Portfolio</h2>
     </div>
-
-    <div class="row m-2">
-      <p><strong>Cash Balance:</strong> ${{ portfolio.cash_balance }}</p>
-      <p><strong>Total Portfolio Value:</strong> ${{ portfolio.portfolio_value }}</p>
-    </div>
-
-    {% if portfolio.positions %}
-    <div class="row m-2">
-      <table class="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th>Company</th>
-            <th>Avg Cost</th>
-            <th>Current Price</th>
-            <th>Shares</th>
-            <th>Position Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for position in portfolio.positions.values() %}
-          <tr>
-            <td>{{ position.symbol }}</td>
-            <td>{{ position.company_name }}</td>
-            <td>${{ position.price_per_share }}</td>
-            <td>${{ position.last_price_per_share }}</td>
-            <td>{{ position.number_of_shares }}</td>
-            <td>${{ position.total_value }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% else %}
-    <div class="row m-2">
-      <p>You currently hold no equities.</p>
-    </div>
-    {% endif %}
-
   </div>
 
-  <div class="col-4 bg-warning">
+  <div class="row g-4">
+    <!-- Holdings -->
+    <div class="col-md-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          My Holdings
+        </div>
+        <div class="card-body">
 
-    <div class="row text-center">
-      <h3>Actions</h3>
+          <!-- Portfolio Summary -->
+          <div class="mb-4">
+            <p><strong>Cash Balance:</strong> ${{ portfolio.cash_balance|currency }}</p>
+            <p><strong>Total Portfolio Value:</strong> ${{ portfolio.portfolio_value|currency }}</p>
+          </div>
+
+          <!-- Holdings Table -->
+          {% if portfolio.positions %}
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Company</th>
+                  <th>Avg Cost</th>
+                  <th>Current Price</th>
+                  <th>Shares</th>
+                  <th>Position Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for position in portfolio.positions.values() %}
+                <tr>
+                  <td>{{ position.symbol|toupper }}</td>
+                  <td>{{ position.company_name|titlecase }}</td>
+                  <td>${{ position.price_per_share|currency }}</td>
+                  <td>${{ position.last_price_per_share|currency }}</td>
+                  <td>{{ position.number_of_shares }}</td>
+                  <td>${{ position.total_value|currency }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted text-center">You currently hold no equities.</p>
+          {% endif %}
+
+        </div>
+      </div>
     </div>
 
-    <div class="row text-center">
-      <a href="/market" class="btn btn-danger">Buy / Sell stocks</a>
+    <!-- Actions -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          Actions
+        </div>
+        <div class="card-body d-grid gap-3">
+          <a href="/market" class="btn btn-buy">Buy / Sell Stocks</a>
+          <a href="/account" class="btn btn-secondary">Deposit Funds</a>
+          <a href="/account" class="btn btn-secondary">Withdraw Funds</a>
+          <a href="/account" class="btn btn-secondary">See Account History</a>
+          <a href="/trade_history" class="btn btn-secondary">See Trade History</a>
+          <a href="/portfolio_statement" class="btn btn-primary">Download Portfolio Statement</a>
+        </div>
+      </div>
     </div>
-
-    <div class="row text-center">
-      <a href="/deposit_funds" class="btn btn-danger">Deposit funds</a>
-    </div>
-
-    <div class="row text-center">
-      <a href="/withdraw_funds" class="btn btn-danger">Withdraw funds</a>
-    </div>
-
-    <div class="row text-center">
-      <a href="/account_history" class="btn btn-danger">See account history</a>
-    </div>
-
-    <div class="row text-center">
-      <a href="/trade_history" class="btn btn-danger">See trade history</a>
-    </div>
-
   </div>
-
 </div>
-
 {% endblock %}

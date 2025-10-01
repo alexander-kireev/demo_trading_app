@@ -39,7 +39,7 @@ def create_stocks(symbols):
 def live_stock_price(symbol):
     """ Accepts a symbol of equity and returns a live price from the API. """
 
-    return Ticker(symbol).info["regularMarketPrice"]
+    return Ticker(symbol).fast_info["lastPrice"]
 
 
 
