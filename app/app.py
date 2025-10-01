@@ -73,7 +73,8 @@ from app.utils import (
     valid_first_name,
     valid_last_name,
     valid_password,
-    valid_deposit_amount
+    valid_deposit_and_withdraw_amount,
+    valid_num_shares
 )
 
 from app.stock.stock_model import Stock
@@ -394,42 +395,51 @@ def delete_account():
         return render_template("delete_account.html")
 
 
-
+# tested, functional, commented
 @app.route("/market", methods=["GET", "POST"])
 @login_required
 def market():
 
+    # POST request
     if request.method == "POST":
         return render_template("market.html")
+    
+    # GET request
     else:
         
+        # get input
         symbol = request.args.get("ticker", "").strip().lower()
         
-
+        # if symbol was provided (not initial page load)
         if len(symbol) > 0:
             
-            
+            # ensure symbol is valid
             if symbol.upper() not in ALL_SYMBOLS:
                 flash("Please enter a valid ticker.", "danger")
                 return redirect("/market")
             
+            # instantiate stock object
             stock = create_stock(symbol)
 
+            # ensure stock object was instantiated successfully
             if not stock:
                 flash("Something went wrong. Please try again.", "danger")
                 return redirect("/market")
             
-            # FETCH USER DATA
+            # instantiate user object
             user_id = session["user_id"]
+
+            # get total position of user of particular equity
             result = get_user_position_by_symbol(user_id, symbol)
 
+            # ensure position was fetched successfully
             if result["success"]:
                 position = result["message"]
-
                 shares_held = position.number_of_shares
                 average_price_per_share = position.price_per_share
                 total_position_value = position.total_value
             
+            # if position was not fetched successfully
             else:
                 shares_held = 0
                 average_price_per_share = 0.00
@@ -438,61 +448,63 @@ def market():
             return render_template("market.html", stock=stock, shares_held=shares_held,
                                    average_price_per_share=average_price_per_share, total_position_value=total_position_value)
 
+        # initial page load without symbol
         return render_template("market.html")
 
-
+# tested, functional, commented
 @app.route("/place_order", methods=["POST"])
 @login_required
 def place_order():
 
+    # POST request
     if request.method == "POST":
 
+        # get type of order, symbol and user_id
         action = request.form.get("action")
         symbol = request.form.get("display_stock_symbol").strip().lower()
-        
         user_id = session["user_id"]
+        num_shares = request.form.get("order_amount")
 
-        try:
-            num_shares = int(request.form.get("order_amount"))
-        except (ValueError, TypeError):
+        # ensure number of shares is valid
+        if not valid_num_shares(num_shares):
             flash("Please enter a valid number of shares.", "danger")
             return redirect("/market")
 
-        if not num_shares:
-            flash("Please enter a valid number of shares.", "danger")
-            return redirect("/market")
-        
-        if num_shares < 1 or num_shares > 100000:
-            flash("Please enter a valid number of shares.", "danger")
-            return redirect("/market")
-
+        # ensure symbol provided is valid
         if symbol.upper() not in ALL_SYMBOLS:
             flash("Something went wrong. Please try again.", "danger")
             return redirect("/market")
         
+        # instantiate stock object
         stock = create_stock(symbol)
 
+        # ensure stock was instantiated successfully
         if not stock:
             flash("Something went wrong. Please try again.", "danger")
             return redirect("/market")
 
-        
-
+    
+        # BUY action branch
         if action == "BUY":
+
+            # ensure stock was purchased successfully
             result = buy_stock(user_id, symbol, num_shares)
             if result["success"]:
                 flash("Shares purchased successfully.", "success")
             else:
                 flash("Failed to purchase shares.", "danger")
 
-
+        # SELL action branch
         elif action == "SELL":
+
+            # ensure stock was sold successfully
             result = sell_stock(user_id, symbol, num_shares)
             if result["success"]:
                 flash("Shares sold successfully.", "success")
             else:
                 flash("Failed to sell shares.", "danger")
         
+        # INVALID action branch
         else:
             flash("Invalid action. Please try again.", "danger")
             return redirect("/market")
@@ -500,92 +512,137 @@ def place_order():
         return redirect("/market")
         
 
-
-
+# tested, functional, commented TODO: handle if portfolio was not fetched
 @app.route("/portfolio", methods=["GET"])
 @login_required
 def portfolio():
 
+    # GET request
     if request.method == "GET":
-
+        
+        # get user_id and portfolio
         user_id = session["user_id"]
         portfolio = get_portfolio(user_id)
         
-
-        
-
         return render_template("portfolio.html", portfolio=portfolio)
 
 
-
-
+# tested, functional, commented
 @app.route("/trade_history", methods=["GET"])
 @login_required
 def trade_history():
 
+    # GET request
     if request.method == "GET":
 
+        # get input, user_id
         start_date = request.args.get("start_date")
         end_date = request.args.get("end_date")
-
         user_id = session["user_id"]
 
+        # get user trade history
         result = get_user_trade_history(user_id, start_date, end_date)
 
+        # if history was fetched successfully
         if result["success"]:
             trades = result["message"]
+        
+        # if it wasn't
         else:
             flash(result["message"], "danger")
             trades = []
 
-
         return render_template("trade_history.html", trades=trades)
 
 
-
+# tested, functional, commented
 @app.route("/account", methods=["GET"])
 @login_required
 def account():
 
+    # GET request
     if request.method == "GET":
 
+        # get input, user_id
         start_date = request.args.get("start_date")
         end_date = request.args.get("end_date")
-
         user_id = session["user_id"]
         
+        # get user transaction history
         result = get_user_transaction_history(user_id, start_date, end_date)
 
+        # if results were fetched successfully
         if result["success"]:
             transactions = result["message"]
+        
+        # if results were not fetched
         else:
             flash(result["message"], "danger")
             transactions = []
+        
+        # get user portfolio
+        portfolio = get_portfolio(user_id)
 
-        return render_template("account.html", transactions=transactions)
+        return render_template("account.html", transactions=transactions, portfolio=portfolio)
 
 
+# tested, functional, commented
 @app.route("/deposit_funds", methods=["POST"])
 @login_required
 def deposit_funds():
 
+    # POST request
     if request.method == "POST":
 
+        # get input and user_id
         deposit_amount = request.form.get("deposit_amount")
-
-        deposit_amount = valid_deposit_amount(deposit_amount)
-
-        if not deposit_amount:
-            flash("Please enter a valid deposit amount." "danger")
-            return redirect("/account")
-        
-
         user_id = session["user_id"]
 
-        result = deposit_user_funds(user_id, deposit_amount)
+        # ensure deposit amount is valid
+        if not valid_deposit_and_withdraw_amount(deposit_amount):
+            flash("Please enter a valid deposit amount.", "danger")
+            return redirect("/account")
+        
+        # log deposit
+        result = deposit_user_funds(user_id, float(deposit_amount))
 
+        # if deposit was successful
         if result["success"]:
             flash(result["message"], "success")
+        
+        # if deposit was unsuccessful
+        else:
+            flash(result["message"], "danger")
+            return redirect("/account")
+        
+        return redirect("/account")
+
+
+# tested, functional, commented
+@app.route("/withdraw_funds", methods=["POST"])
+@login_required
+def withdraw_funds():
+
+    # POST request
+    if request.method == "POST":
+
+        # get input and user_id
+        withdraw_amount = request.form.get("withdraw_amount")
+        user_id = session["user_id"]
+
+        # ensure withdrawl amount is valid
+        if not valid_deposit_and_withdraw_amount(withdraw_amount):
+            flash("Please enter a valid withdraw amount.", "danger")
+            return redirect("/account")
+        
+        # log withdrawl
+        result = withdraw_user_funds(user_id, float(withdraw_amount))
+
+        # if withdrawl was successful
+        if result["success"]:
+            flash(result["message"], "success")
+        
+        # if withdrawl was unsuccessful
         else:
             flash(result["message"], "danger")
             return redirect("/account")
@@ -594,7 +651,13 @@ def deposit_funds():
 
 
 
-        
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     app.secret_key = os.getenv("SECRET_KEY")

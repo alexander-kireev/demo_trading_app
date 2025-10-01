@@ -266,9 +266,10 @@ def deposit_user_funds(user_id, amount):
 # tested, functional, commented
 def withdraw_user_funds(user_id, amount):
     """ Accepts a user_id and amount to withdraw, validates amount, updates cash balance to reflect withdrawl. """
-    
+    conn = DBCore.get_connection()
+
     try:
-        with DBCore.get_connection() as conn:
+        with conn:
             with conn.cursor() as cur:
                 
                 # get user object
@@ -299,7 +300,7 @@ def withdraw_user_funds(user_id, amount):
                 if not log_transaction(cur, transaction):
                     return {
                             "success": False,
-                            "message": "Failed to log withdraw in transactions table."
+                            "message": "Failed to log withdrawl in transactions table."
                     }                            
 
                 conn.commit()
@@ -309,6 +310,7 @@ def withdraw_user_funds(user_id, amount):
                 }            
 
     except Exception as e:
+        conn.rollback()
         return {
                 "success": False,
                 "message": f"Error. Failed to withdraw funds: {e}."

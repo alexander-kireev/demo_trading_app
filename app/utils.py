@@ -79,10 +79,26 @@ def passwords_match(password_1, password_2):
     return password_1 == password_2
 
 
-def valid_deposit_amount(amount):
+def valid_deposit_and_withdraw_amount(amount):
 
     try:
         amount = float(amount)
-        return amount > 10 and amount < 1000000
+        if amount > 10 and amount < 1000000:
+            return True
+        return False
+    except (ValueError, TypeError):
+        return False
+    
+
+
+def valid_num_shares(num_shares):
+    try:
+        num_shares = int(num_shares)
+
+        if num_shares < 1 or num_shares > 100000:
+            return False
+        
+        return True
+    
     except (ValueError, TypeError):
         return False
