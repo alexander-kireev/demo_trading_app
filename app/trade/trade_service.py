@@ -1,39 +1,26 @@
 from app.db_core import DBCore
-from app.user.user_repo import (
-    get_user_by_id,
-    update_user_cash_balance
-)
-
-from app.user.user_model import User
+from app.position.position_model import Position
+from app.stock.stock_service import create_stock
 from datetime import datetime, timedelta
-
 from app.trade.trade_model import Trade
+
 from app.trade.trade_repo import (
     log_trade,
     get_trades
 )
 
-from app.position.position_model import Position
-from app.position.positions_model import Positions
-
 from app.position.position_repo import (
-    get_user_single_position_of_equity,
     get_user_positions_of_equity,
     log_position,
     close_position,
     update_position,
     update_positions_last_price
 )
-
-from app.position.position_service import (
-    update_positions_in_table,
+from app.user.user_repo import (
+    get_user_by_id,
+    update_user_cash_balance
 )
 
-from app.stock.stock_service import (
-    live_stock_price,
-    create_stock,
-    create_stocks
-)
 
 # tested, functional, commented
 def buy_stock(user_id, symbol, number_of_shares):

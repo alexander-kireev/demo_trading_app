@@ -1,19 +1,24 @@
+import os
+from functools import wraps
+from datetime import datetime
+from dotenv import load_dotenv
+
+from app.transaction.transaction_service import get_user_transaction_history
+from app.position.position_service import get_user_position_by_symbol
+from app.portfolio.portfolio_service import get_portfolio
+from app.stock.stock_service import create_stock
+from app.exchange_data.exchange_service import ALL_SYMBOLS
+
 from flask import (
     Flask,
-    render_template,
+    session,
     request,
+    render_template,
     redirect,
     url_for,
-    session,
     flash,
     send_file
 )
-
-from app.exchange_data.exchange_service import (
-    ALL_SYMBOLS
-)
-
-
 
 from app.trade.trade_service import (
     buy_stock,
@@ -21,46 +26,16 @@ from app.trade.trade_service import (
     get_user_trade_history
 )
 
-from app.portfolio.portfolio_model import Portfolio
-
-from app.portfolio.portfolio_service import (
-    get_portfolio
-)
-
-from functools import wraps
-from datetime import datetime, timedelta
-import os
-from dotenv import load_dotenv
-
 from app.user.user_service import (
     register_user,
     authenticate_user,
     get_user,
     update_user_email,
-    insert_user_password,
     update_user_password,
     delete_user,
     update_user_details,
     deposit_user_funds,
     withdraw_user_funds
-)
-
-from app.transaction.transaction_service import (
-    get_user_transaction_history
-)
-
-from app.position.position_model import Position
-
-from app.position.position_service import (
-    aggregate_all_equity_positions,
-    aggregate_positions_of_single_equity,
-    aggregate_total_value_of_equity_positions,
-    get_user_position_by_symbol
-)
-
-from app.user.user_repo import (
-    get_user_by_email,
-    get_user_by_id
 )
 
 from app.utils import (
@@ -69,8 +44,6 @@ from app.utils import (
     passwords_match,
     verify_password,
     hash_password,
-    valid_dob,
-    valid_email,
     valid_first_name,
     valid_last_name,
     valid_password,
@@ -78,58 +51,54 @@ from app.utils import (
     valid_num_shares
 )
 
-from app.stock.stock_model import Stock
-
-from app.stock.stock_service import (
-    create_stock,
-    create_stocks
-)
-
-
-
-
 from app.pdf_generator import (
     generate_portfolio_statement,
     generate_transaction_statement,
     generate_trade_statement
 )
 
-
 load_dotenv()
+
 app = Flask(__name__)
 
 
-
+# tested, functional, commented
 @app.template_filter()
 def currency(value):
-    """Format a number as currency with commas and 2 decimals."""
+    """ Format a number as currency with commas and 2 decimals. """
+
     try:
         return f"{float(value):,.2f}"
     except (ValueError, TypeError):
         return value
 
+
+# tested, functional, commented
 @app.template_filter()
 def toupper(value):
-    """Convert string to uppercase (e.g., stock symbols)."""
+    """ Convert string to uppercase. """
+
     if value:
         return str(value).upper()
     return value
 
+
+# tested, functional, commented
 @app.template_filter()
 def titlecase(value):
-    """Convert string to Title Case (e.g., company names)."""
+    """ Convert string to Title Case. """
+
     if value:
         return str(value).title()
     return value
 
 
-
+# tested, functional, commented
 @app.template_filter()
 def shorttime(value):
-    """
-    Format a datetime to show date + hours:minutes (no seconds/millis).
-    Example: 2025-10-01 14:30
-    """
+    """ Format a datetime to show date + hours:minutes (no seconds/millis).
+        Example: 2025-10-01 14:30 """
+    
     if isinstance(value, datetime):
         return value.strftime("%d %b %Y %H:%M")
     try:
@@ -138,24 +107,36 @@ def shorttime(value):
     except Exception:
         return value
 
+
+# tested, functional, commented
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        """ Ensures user is logged in before providing access to route. """
+
         if "user_id" not in session:
             return redirect(url_for("log_in"))
         return f(*args, **kwargs)
+    
     return decorated_function
 
 
-
+# tested, functional, commented
 @app.route("/")
 def home():
+    """ Index html route, based on whether user is logged in or not. """
 
     try:
+
+        # if user is logged in, redirect to /portfolio
         if session["user_id"]:
             return redirect("/portfolio")
+        
+        # else, redirect to index
         else:
             return render_template("index.html")
+    
+    # else, redirect to index
     except:
         return render_template("index.html")
 
@@ -208,9 +189,9 @@ def signup():
         }
         
         # validate input
-        error = validate_registration_data(data)
-        if error:
-            flash(error, "danger")
+        result = validate_registration_data(data)
+        if not result["success"]:
+            flash(result["message"], "danger")
             return redirect("/sign_up")
 
         # register user
@@ -315,6 +296,12 @@ def change_password():
         # ensure input was provided
         if not current_password or not new_password_1 or not new_password_2:
             flash("Please enter your current and new passwords.", "danger")
+            return redirect("/change_password")
+
+        # ensure password is valid
+        password_result = valid_password(new_password_1)
+        if not password_result["success"]:
+            flash(password_result["message"], "danger")
             return redirect("/change_password")
 
         # get user
@@ -562,14 +549,14 @@ def place_order():
         user_id = session["user_id"]
         num_shares = request.form.get("order_amount")
 
+        # format number of shares
+        num_shares = valid_num_shares(num_shares)
+
         # ensure number of shares is valid
-        if not valid_num_shares(num_shares):
+        if num_shares is None:
             flash("Please enter a valid number of shares.", "danger")
             return redirect("/market")
         
-        # format number of shares
-        num_shares = int(num_shares)
-
         # ensure symbol provided is valid
         if symbol.upper() not in ALL_SYMBOLS:
             flash("Something went wrong. Please try again.", "danger")
@@ -750,18 +737,18 @@ def withdraw_funds():
         return redirect("/account")
 
 
-
-
-
-
-
+# tested, functional, commented
 @app.route("/portfolio_statement", methods=["GET"])
 @login_required
 def portfolio_statement():
+
+    # get user object
     user_id = session["user_id"]
 
+    # generate pdf file
     pdf_file = generate_portfolio_statement(user_id)
 
+    # ensure it was generated
     if not pdf_file:
         flash("Failed generating portfolio statement.", "danger")
         return redirect("/portfolio")
@@ -769,13 +756,16 @@ def portfolio_statement():
     return send_file(pdf_file, as_attachment=True)
 
 
-
+# tested, functional, commented
 @app.route("/trade_history", methods=["POST"])
 @login_required
 def trade_history():
+
+    # get user object and input
     user_id = session.get("user_id")  
     history_type = request.form.get("history_type")
 
+    # check date constraints on query
     if history_type == "all":
         trades_result = get_user_trade_history(user_id)
     else:
@@ -783,23 +773,30 @@ def trade_history():
         end_date = request.form.get("end_date")
         trades_result = get_user_trade_history(user_id, start_date, end_date)
 
+    # ensure trades were fetched
     if not trades_result["success"]:
         flash("No trades found for the selected period.", "danger")
         return redirect("/trades")
 
+    # extract list of trade objects
     trades = trades_result["message"]  
 
+    # generate pdf file
     pdf_file = generate_trade_statement(user_id, trades)  
+
     return send_file(pdf_file, as_attachment=True)
 
 
-
+# tested, functional, commented
 @app.route("/transaction_history", methods=["POST"])
 @login_required
 def transaction_history():
+
+    # get user object, input
     user_id = session["user_id"]
     history_type = request.form.get("history_type")
 
+    # check date constraints on query
     if history_type == "all":
         tx_result = get_user_transaction_history(user_id)
     else:
@@ -807,13 +804,19 @@ def transaction_history():
         end_date = request.form.get("end_date")
         tx_result = get_user_transaction_history(user_id, start_date, end_date)
 
+    # ensure transactions were fetched
     if not tx_result["success"]:
         flash("No transactions found for the selected period.", "danger")
         return redirect("/account")
 
+    # extract list of transaction objects
     transactions = tx_result["message"]
+
+    # generate pdf file
     pdf_file = generate_transaction_statement(user_id, transactions)
+
     return send_file(pdf_file, as_attachment=True)
+
 
 
 
@@ -821,21 +824,3 @@ def transaction_history():
 if __name__ == "__main__":
     app.secret_key = os.getenv("SECRET_KEY")
     app.run(debug=True)
-
-
-
-
-
-
-
-# print(generate_portfolio_statement(5))
-
-
-
-
-# num_shares = 1 
-# symbol = "goog"
-# user_id = 5
-
-
-# print(buy_stock(user_id, symbol, num_shares))

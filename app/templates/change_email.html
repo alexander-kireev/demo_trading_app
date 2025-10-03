@@ -4,11 +4,12 @@
 
 {% block content %}
 
-  
+<!-- heading -->
 <div class="row text-center">
   <h2>Change email address</h2>
 </div>
 
+<!-- flash messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, msg in messages %}
@@ -19,29 +20,34 @@
   {% endif %}
 {% endwith %}
 
+<!-- change email form -->
 <form action="/change_email" method="POST">
 
-  <div class="row">
+  <!-- current email -->
+  <div class="row mb-3">
     <label for="current_email" class="col-sm-2 col-form-label">Current email:</label>
     <div class="col-sm-10">
       <input type="text" readonly class="form-control-plaintext" id="current_email" value="{{ current_email }}">
     </div>
   </div>
 
-  <div class="row">
+  <!-- new email -->
+  <div class="row mb-3">
     <label for="new_email" class="col-sm-2 col-form-label">New email:</label>
     <div class="col-sm-10">
-      <input type="email" class="form-control" id="new_email" name="new_email">
+      <input type="email" class="form-control" id="new_email" name="new_email" required>
     </div>
   </div>
 
-  <div class="row">
+  <!-- password -->
+  <div class="row mb-3">
     <label for="password" class="col-sm-2 col-form-label">Password</label>
     <div class="col-sm-10">
-      <input type="password" class="form-control" id="password" name="password">
+      <input type="password" class="form-control" id="password" name="password" required>
     </div>
   </div>
 
+  <!-- action buttons -->
   <div class="row">
     <div class="text-center">
       <button type="submit" class="btn btn-primary">Save</button>

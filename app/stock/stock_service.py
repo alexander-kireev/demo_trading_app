@@ -1,5 +1,4 @@
-from yfinance import Ticker, Tickers
-
+from yfinance import Ticker
 from app.stock.stock_model import Stock
 
 

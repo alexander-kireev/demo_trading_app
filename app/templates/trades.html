@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container my-5">
 
-  <!-- Heading -->
+  <!-- heading -->
   <div class="row mb-4">
     <div class="col text-center">
       <h2 class="fw-bold text-uppercase text-dark">Trade History</h2>
@@ -13,7 +13,7 @@
   </div>
 
   <div class="row g-4">
-    <!-- Trade History Table -->
+    <!-- trade history table -->
     <div class="col-md-8">
       <div class="card shadow-sm mb-4">
         <div class="card-header">
@@ -21,7 +21,7 @@
         </div>
         <div class="card-body">
 
-          <!-- Flash Messages -->
+          <!-- flash messages -->
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, msg in messages %}
@@ -32,7 +32,7 @@
             {% endif %}
           {% endwith %}
 
-          <!-- Date Filter -->
+          <!-- date filter -->
           <form action="/trades" method="GET" class="row g-3 mb-4">
             <div class="col-md-5">
               <label for="start_date" class="form-label">Start date</label>
@@ -47,7 +47,7 @@
             </div>
           </form>
 
-          <!-- Trades Table -->
+          <!-- trades table -->
           {% if trades %}
           <div class="table-responsive">
             <table class="table table-striped table-bordered align-middle">
@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <!-- Actions -->
+    <!-- actions -->
     <div class="col-md-4">
       <div class="card shadow-sm">
         <div class="card-header">
@@ -100,7 +100,7 @@
   </div>
 </div>
 
-<!-- Trade History Modal -->
+<!-- trade history modal -->
 <div class="modal fade" id="tradeHistoryModal" tabindex="-1" aria-labelledby="tradeHistoryModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">

@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container my-5">
 
-  <!-- Heading -->
+  <!-- heading -->
   <div class="row mb-4">
     <div class="col text-center">
       <h2 class="fw-bold text-uppercase text-dark">Market</h2>
@@ -13,7 +13,7 @@
     </div>
   </div>
 
-  <!-- Flash Messages -->
+  <!-- flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, msg in messages %}
@@ -26,7 +26,7 @@
 
 <div class="row g-4 align-items-stretch">
 
-  <!-- Stock Search -->
+  <!-- stock search -->
   <div class="col-md-5">
     <div class="card shadow-sm h-100">
       <div class="card-header">
@@ -44,26 +44,26 @@
     </div>
   </div>
 
-  <!-- Stock Info -->
+  <!-- stock info -->
   <div class="col-md-7">
     <div class="card shadow-sm h-100">
       <div class="card-header">
         Stock Details
       </div>
       <div class="card-body">
-        <!-- Symbol -->
+        <!-- symbol -->
         <div class="row mb-3">
           <div class="col-sm-5 fw-bold">Symbol:</div>
           <div class="col-sm-7">{{ stock.symbol|toupper if stock else '-' }}</div>
         </div>
 
-        <!-- Company -->
+        <!-- company -->
         <div class="row mb-3">
           <div class="col-sm-5 fw-bold">Company:</div>
           <div class="col-sm-7">{{ stock.company_name|titlecase if stock else '-' }}</div>
         </div>
 
-        <!-- Current price -->
+        <!-- current price -->
         <div class="row mb-4">
           <div class="col-sm-5 fw-bold">Current price:</div>
           <div class="col-sm-7">
@@ -71,7 +71,7 @@
           </div>
         </div>
 
-        <!-- Actions -->
+        <!-- actions -->
         <div class="d-flex justify-content-between">
           <button type="button" class="btn btn-buy w-50 me-2" data-bs-toggle="modal" data-bs-target="#authModal">Buy</button>
           <button type="button" class="btn btn-sell w-50" data-bs-toggle="modal" data-bs-target="#authModal">Sell</button>
@@ -84,7 +84,7 @@
 
 </div>
 
-<!-- Auth Required Modal -->
+<!-- auth required modal -->
 <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">

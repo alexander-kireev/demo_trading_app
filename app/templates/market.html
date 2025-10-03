@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container my-5">
 
-  <!-- Heading -->
+  <!-- heading -->
   <div class="row mb-4">
     <div class="col text-center">
       <h2 class="fw-bold text-uppercase text-dark">Market</h2>
@@ -13,7 +13,7 @@
     </div>
   </div>
 
-  <!-- Flash Messages -->
+  <!-- flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, msg in messages %}
@@ -26,7 +26,7 @@
 
   <div class="row g-4">
 
-    <!-- Stock Search -->
+    <!-- stock search -->
     <div class="col-md-5">
       <div class="card shadow-sm">
         <div class="card-header">
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <!-- Stock Info + Order -->
+    <!-- stock info + order -->
     <div class="col-md-7">
       <div class="card shadow-sm">
         <div class="card-header">
@@ -54,7 +54,7 @@
 
           <form action="/place_order" method="POST">
 
-            <!-- Symbol -->
+            <!-- symbol -->
             <div class="row mb-3">
               <div class="col-sm-5 fw-bold">Symbol:</div>
               <div class="col-sm-7">{{ stock.symbol|toupper if stock else '-' }}</div>
@@ -62,7 +62,7 @@
                      value="{{ stock.symbol if stock else '' }}">
             </div>
 
-            <!-- Company -->
+            <!-- company -->
             <div class="row mb-3">
               <div class="col-sm-5 fw-bold">Company:</div>
               <div class="col-sm-7">{{ stock.company_name|titlecase if stock else '-' }}</div>
@@ -70,7 +70,7 @@
                      value="{{ stock.company_name if stock else '' }}">
             </div>
 
-            <!-- Shares held -->
+            <!-- shares held -->
             <div class="row mb-3">
               <div class="col-sm-5 fw-bold">Shares held:</div>
               <div class="col-sm-7">{{ shares_held if shares_held else 0 }}</div>
@@ -78,7 +78,7 @@
                      value="{{ shares_held }}">
             </div>
 
-            <!-- Average cost -->
+            <!-- average cost -->
             <div class="row mb-3">
               <div class="col-sm-5 fw-bold">Avg. cost/share:</div>
               <div class="col-sm-7">
@@ -88,7 +88,7 @@
                      value="{{ average_price_per_share }}">
             </div>
 
-            <!-- Total position -->
+            <!-- total position -->
             <div class="row mb-3">
               <div class="col-sm-5 fw-bold">Total value:</div>
               <div class="col-sm-7">
@@ -98,7 +98,7 @@
                      value="{{ total_position_value }}">
             </div>
 
-            <!-- Current price -->
+            <!-- current price -->
             <div class="row mb-4">
               <div class="col-sm-5 fw-bold">Current price:</div>
               <div class="col-sm-7">
@@ -108,13 +108,13 @@
                      value="{{ stock.price if stock else '' }}">
             </div>
 
-            <!-- Order amount -->
+            <!-- order amount -->
             <div class="mb-3">
               <label for="order_amount" class="form-label">Number of shares:</label>
               <input type="number" min="1" max="100000" class="form-control" required id="order_amount" name="order_amount">
             </div>
 
-            <!-- Actions -->
+            <!-- actions -->
             <div class="d-flex justify-content-between">
               <button type="submit" name="action" value="BUY" class="btn btn-buy w-50 me-2">Buy</button>
               <button type="submit" name="action" value="SELL" class="btn btn-sell w-50">Sell</button>

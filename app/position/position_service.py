@@ -1,20 +1,12 @@
 from app.db_core import DBCore
-
-from app.position.position_repo import (
-    get_user_equity_symbols,
-    get_user_positions_of_equity,
-    get_user_single_position_of_equity,
-    user_has_position_of_symbol
-)
 from app.stock.stock_model import Stock
-
 from app.position.position_model import Position
 
 from app.position.position_repo import (
-    get_user_positions_of_equity,
-    get_user_single_position_of_equity,
-    get_all_user_positions,
     get_user_equity_symbols,
+    get_user_positions_of_equity,
+    user_has_position_of_symbol,
+    get_all_user_positions,
     update_list_of_positions
 )
 
@@ -22,14 +14,20 @@ from app.stock.stock_service import (
     live_stock_price
 )
 
-# NOT TESTED
+
+# tested, functional, commented
 def get_user_position_by_symbol(user_id, symbol):
+    """ Accepts a user_id and symbol, checks if user has open positions of that equity.
+        If so, aggregates all open positions into one and returns it. """
     
     try:
         with DBCore.get_connection() as conn:
             with conn.cursor() as cur:
-
+                
+                # check if user has any open positions of that equity
                 if user_has_position_of_symbol(cur, user_id, symbol):
+                    
+                    # if so, aggregate all positions into one
                     result = aggregate_positions_of_single_equity(cur, user_id, symbol)
                     
                     if result:

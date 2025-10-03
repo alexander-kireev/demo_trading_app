@@ -1,14 +1,3 @@
-
-from app.portfolio.portfolio_model import Portfolio
-
-from app.portfolio.portfolio_service import (
-    get_portfolio
-)
-
-from app.user.user_service import (
-    get_user
-)
-
 import os
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, PageBreak
@@ -18,7 +7,15 @@ from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from datetime import datetime
 
+from app.portfolio.portfolio_service import (
+    get_portfolio
+)
 
+from app.user.user_service import (
+    get_user
+)
+
+# tested, functional, commented
 class NumberedCanvas(canvas.Canvas):
     """Custom canvas class to add page numbers 'Page X of Y'"""
     def __init__(self, *args, **kwargs):
@@ -43,7 +40,7 @@ class NumberedCanvas(canvas.Canvas):
         self.drawRightString(200*mm, 15*mm, page_number_text)
 
 
-
+# tested, functional, commented
 def generate_portfolio_statement(user_id, filename=None):
     """
     Generates a PDF statement for a user's portfolio.
@@ -137,10 +134,7 @@ def generate_portfolio_statement(user_id, filename=None):
     return filepath
 
 
-
-
-
-
+# tested, functional, commented
 def generate_trade_statement(user_id, trades, filename=None):
     """
     Generates a PDF statement for a user's trade history.
@@ -240,14 +234,7 @@ def generate_trade_statement(user_id, trades, filename=None):
     return filepath
 
 
-
-
-
-
-
-
-
-
+# tested, functional, commented
 def generate_transaction_statement(user_id, transactions, filename=None):
     """
     Generates a PDF statement for a user's transaction history.

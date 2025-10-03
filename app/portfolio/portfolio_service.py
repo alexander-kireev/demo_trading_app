@@ -1,33 +1,17 @@
-from app.user.user_model import User
+from app.db_core import DBCore
+from app.portfolio.portfolio_model import Portfolio
+from app.position.position_repo import get_user_equity_symbols
+
 from app.user.user_service import (
     get_user_by_id
 )
 
-from pprint import pprint
-from app.stock.stock_service import (
-    live_stock_price
-)
-from app.db_core import DBCore
-
-from app.portfolio.portfolio_model import Portfolio
-
-from app.position.position_model import Position
-from app.position.positions_model import Positions
-
 from app.position.position_service import (
-    aggregate_positions_of_single_equity,
     aggregate_all_equity_positions,
     aggregate_total_value_of_equity_positions,
     update_positions_in_table
 )
 
-from app.position.position_repo import (
-    get_user_positions_of_equity,
-    get_user_single_position_of_equity,
-    get_all_user_positions,
-    get_user_equity_symbols,
-    update_list_of_positions
-)
 
 # tested, functional, commented
 def get_portfolio(user_id):

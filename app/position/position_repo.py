@@ -1,9 +1,9 @@
 from app.stock.stock_model import Stock
-
 from app.position.position_model import Position
 from app.position.positions_model import Positions
 
-# POSSIBLY REDUNDANT, OR WILL HAVE TO REFACTOR TO USE SOME OTHER ARGS
+
+# tested, functional, commented
 def get_user_single_position_of_equity(cur, user_id, symbol):
 
     cur.execute(""" SELECT * FROM positions WHERE user_id=%s AND symbol=%s """, (user_id, symbol))

@@ -4,11 +4,12 @@
 
 {% block content %}
 
-  
+<!-- heading -->
 <div class="row text-center">
   <h2>Change your details</h2>
 </div>
 
+<!-- flash messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, msg in messages %}
@@ -19,29 +20,34 @@
   {% endif %}
 {% endwith %}
 
+<!-- change details form -->
 <form action="/change_user_details" method="POST">
 
-  <div class="row">
+  <!-- first name -->
+  <div class="row mb-3">
     <label for="first_name" class="col-sm-2 col-form-label">First name:</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" id="first_name" name="first_name" placeholder="{{ first_name }}">
     </div>
   </div>
 
-  <div class="row">
+  <!-- last name -->
+  <div class="row mb-3">
     <label for="last_name" class="col-sm-2 col-form-label">Last name:</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" id="last_name" name="last_name" placeholder="{{ last_name }}">
     </div>
   </div>
 
+  <!-- date of birth -->
   <div class="row mb-3">
-    <label for="dob" class="col-sm-2 col-form-label">Date of Birth</label>
+    <label for="dob" class="col-sm-2 col-form-label">Date of Birth:</label>
     <div class="col-sm-10">
       <input type="date" class="form-control" id="dob" name="dob" value="{{ dob }}">
     </div>
   </div>
 
+  <!-- action buttons -->
   <div class="row">
     <div class="text-center">
       <button type="submit" class="btn btn-primary">Save</button>
