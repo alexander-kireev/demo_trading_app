@@ -87,13 +87,6 @@ pip install -r requirements.txt
 
 ---
 
-## Future Improvements
-- Portfolio performance charts
-- Expanded trade analytics (PnL, ratios)
-- Leaderboards for multiple users
-- Docker support for easier setup
-- Deployment to cloud (Heroku, Render, Fly.io)
-
 ---
 
 ## License
